@@ -1,8 +1,10 @@
-import React, { useState, useContext } from 'react';
-import { Text, StyleSheet,FlatList, View, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
+import React, { useState, useContext,useEffect } from 'react';
+import { Text, StyleSheet,FlatList, View, TouchableOpacity, KeyboardAvoidingView, Image } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 import {GlobalContext} from "../context/GlobalContext"
+
+import EditIcon from "../icons/edit_icon.png"
 
 import Exercise from '../models/Exercise';
 import ExerciseFormView from '../ExerciseFormView';
@@ -16,14 +18,28 @@ interface Props
 
 const AddWorkout:React.FC<Props> = ({navigation}) => {
 
-  const {addWorkout} = useContext(GlobalContext)
+  const {addWorkout,editedWorkout,saveEditedWorkout} = useContext(GlobalContext)
   
-  const [workoutDate,setWorkoutDate] = useState<Date>(new Date())
-  const [dateSet,setDateSet] = useState<boolean>(false)
+  const [workoutDate,setWorkoutDate] = useState<Date>( editedWorkout ? editedWorkout.workoutDate :  new Date())
+  const [dateSet,setDateSet] = useState<boolean>(editedWorkout ? true: false)
   const [showDatePicker,setShowDatePicker] = useState<boolean>(false)
 
-  const [exercises,setExercises] = useState<Exercise[]>([])
+  const [exercises,setExercises] = useState<Exercise[]>(editedWorkout ? editedWorkout.exercises : [])
   const [showExerciseForm,setShowExerciseForm] = useState<boolean>(false)
+  const [exerciseToEdit,setExerciseToEdit] = useState<Exercise | undefined>(undefined)
+
+
+  //Sets Ids for exercises on render if editWorkout passed
+  //Thanks to this exercises can be edited 
+  useEffect(()=>{
+    if(editedWorkout){ 
+      const exercisesCopy = exercises.slice();
+      for (let i = 0; i < exercises.length; i++) {
+        exercisesCopy[i].id = i;
+      }
+      setExercises(exercisesCopy);
+    }
+  },[editedWorkout])
 
   //For KeyboardAvoidingView
   const [keyboardEnabled,setKeyboardEnabled] = useState<boolean>(false)
@@ -35,25 +51,59 @@ const AddWorkout:React.FC<Props> = ({navigation}) => {
     setShowDatePicker(false);
   };
 
-
-  const addWorkoutHandler = () => {
+  //If editedWorkout is present means we want to EditWorkout
+  //Else if editedWorkout is not present means we want to Add a Workout
+  const addOrEditWorkout = () => {
     const newWorkout:Workout = new Workout(workoutDate,exercises);
-    if(addWorkout) addWorkout(newWorkout)
+
+    //If Edited workout means we editing so we save the edit
+    if(editedWorkout && saveEditedWorkout )saveEditedWorkout(newWorkout)
+    //ese we are adding a new Workout
+    else if(addWorkout) addWorkout(newWorkout)
+
     navigation.push("Workouts") 
   }
 
+  
+  //Shows form for adding Exercise
   const addExerciseHandler = () => {
     setShowExerciseForm(true)
   }
 
+  //Adds Exercise to Workout Exercises Array
   const addExerciseToWorkout = (exercise:Exercise) => {
+    exercise.id = exercises.length;
     setExercises([...exercises,exercise])
   }
+
+
+  //Edits exercise based on ID
+  const editExercise = (exercise:Exercise) => {
+    if(exerciseToEdit === undefined) return
+    if(exerciseToEdit.id === undefined) return
+
+    const exercisesCopy:Exercise[] = exercises.slice();
+    exercisesCopy[exerciseToEdit.id] = exercise;
+
+    setExercises(exercisesCopy);
+  } 
+
+  //Sets Exercise to Edit
+  const exerciseToEditHandler = (exercise:Exercise) => {
+    setExerciseToEdit(exercise)
+    setShowExerciseForm(true)
+  }
+
   
+  
+
   //Todo Reformat this piece of trash
   return (
     <KeyboardAvoidingView behavior="position" enabled={keyboardEnabled} style={styles.Container}>
      <Text style={styles.Title}> Add your new workout!</Text>
+      {showDatePicker && (
+        <DateTimePicker  mode="date" value={workoutDate ? workoutDate : new Date()} onChange={(event,date)=>onDateChange(event,date)} />
+      )}
      {dateSet === false ?
      <View>
       <TouchableOpacity
@@ -62,10 +112,6 @@ const AddWorkout:React.FC<Props> = ({navigation}) => {
       >
           <Text style={styles.ButtonText}>Pick Workout Date</Text>
       </TouchableOpacity>
-
-      {showDatePicker && (
-        <DateTimePicker  mode="date" value={workoutDate ? workoutDate : new Date()} onChange={(event,date)=>onDateChange(event,date)} />
-      )}
     </View>
     :
     <View>
@@ -73,9 +119,18 @@ const AddWorkout:React.FC<Props> = ({navigation}) => {
      <View>
        <View style={styles.DateContainer}>
         <Text style={styles.Date}>{parseDate(workoutDate)}</Text>
+        <TouchableOpacity onPress={()=>setShowDatePicker(true)}>
+          <Image style={styles.Icon} source={EditIcon} />
+        </TouchableOpacity>
        </View>
        <FlatList data={exercises} 
-       renderItem={({item})=><View style={styles.ExerciseContainer}><Text style={styles.Exercise}>{item.name}</Text></View>} 
+       renderItem={({item})=>
+       <View style={styles.ExerciseContainer}>
+         <Text style={styles.Exercise}>{item.name}</Text>
+         <TouchableOpacity onPress={()=>exerciseToEditHandler(item)}>
+          <Image style={styles.Icon} source={EditIcon} />
+        </TouchableOpacity>
+        </View>} 
        />
        <TouchableOpacity
          style={styles.ButtonWithMargin}
@@ -86,7 +141,7 @@ const AddWorkout:React.FC<Props> = ({navigation}) => {
        {exercises.length > 0 ? 
          <TouchableOpacity
          style={styles.ButtonWithMargin}
-         onPress={addWorkoutHandler}
+         onPress={addOrEditWorkout}
          >
           <Text style={styles.ButtonText}>Add Workout</Text>
         </TouchableOpacity>
@@ -96,7 +151,13 @@ const AddWorkout:React.FC<Props> = ({navigation}) => {
 
      </View>
      :
-     <ExerciseFormView addExerciseToWorkout={addExerciseToWorkout} setKeyboardEnabled={setKeyboardEnabled} setShowExerciseForm={setShowExerciseForm}/>
+     <ExerciseFormView
+     exercise={exerciseToEdit}
+     editExercise={editExercise}
+     addExerciseToWorkout={addExerciseToWorkout} 
+     setKeyboardEnabled={setKeyboardEnabled} 
+     setShowExerciseForm={setShowExerciseForm}
+     />
     }
     </View>
     }
@@ -137,21 +198,31 @@ const styles = StyleSheet.create({
     color:"#fff",
     fontSize:32,
   },
+  Icon:{
+    width:15,
+    height:15,
+    marginLeft:10,
+  },
   DateContainer:{
     backgroundColor : "#3b3b3b",
+    paddingLeft:5,
     width:"70%",
+    flexDirection:"row",
+    alignItems:"center"
   },
   ExerciseContainer:{
     marginLeft:5,
     marginTop:15,
+    flexDirection:"row",
+    backgroundColor : "#3b3b3b",
+    alignSelf: 'flex-start',
+    alignItems:"center",
+    paddingLeft:5,
+    paddingRight:15,
   },
   Exercise:{
     fontSize:20,
     color:"#fff",
-    backgroundColor : "#3b3b3b",
-    alignSelf: 'flex-start',
-    paddingLeft:5,
-    paddingRight:20,
   }
 });
 

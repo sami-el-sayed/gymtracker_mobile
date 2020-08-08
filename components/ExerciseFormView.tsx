@@ -4,21 +4,25 @@ import Point from './models/Point';
 import Exercise from './models/Exercise';
 
 interface Props{
+    exercise?:Exercise,
+    editExercise:(exercise:Exercise)=>void,
     addExerciseToWorkout:(exercise:Exercise) => void,
     setShowExerciseForm:Function,
     setKeyboardEnabled:Function
 }
 
-const ExerciseFormView:React.FC<Props> = ({setShowExerciseForm,addExerciseToWorkout,setKeyboardEnabled}) => {
+//View for adding Exercises to Workout
+//Exercise Can be Passed for editing it 
+const ExerciseFormView:React.FC<Props> = ({exercise,setShowExerciseForm,addExerciseToWorkout,editExercise,setKeyboardEnabled}) => {
     
-    
+ //If Exercise is passed loads exercise parameters into form
  const [exerciseForm,setExerciseForm] = useState({
-     name:"",
-     sets:"",
-     reps:"",
-     weight:"",
-     status:"success"
- }) 
+     name: exercise ? exercise.name : "",
+     sets:exercise ? exercise.points[0].sets.toString() : "",
+     reps:exercise ? exercise.points[0].reps.toString() : "",
+     weight:exercise ? exercise.points[0].weight.toString() : "",
+     status: exercise ? exercise.points[0].status : "success"
+ });
 
 
  //Handler which determines which parameter of the workout form should be changed based on input
@@ -46,6 +50,8 @@ const ExerciseFormView:React.FC<Props> = ({setShowExerciseForm,addExerciseToWork
  }
 
  //Creates and adds Exercise then hides component
+ //If Exercise was passed means we are editing it
+ //So it doesnt add the Exercise, it edits it 
  const saveHandler = () => {
 
     if(exerciseForm.name === "") return;
@@ -62,8 +68,11 @@ const ExerciseFormView:React.FC<Props> = ({setShowExerciseForm,addExerciseToWork
         exerciseForm.status,
     )
 
-    const exercise = new Exercise(exerciseForm.name,[point]);
-    addExerciseToWorkout(exercise);
+    const newExercise = new Exercise(exerciseForm.name,[point]);
+    
+    //If Exercise was passed means we dont want to add one, we want to edit it
+    if(exercise)  editExercise(newExercise);
+    else  addExerciseToWorkout(newExercise);
     setShowExerciseForm(false);
  }
  

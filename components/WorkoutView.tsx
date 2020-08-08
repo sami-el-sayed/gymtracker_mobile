@@ -6,22 +6,31 @@ import EditIcon from "./icons/edit_icon.png";
 import parseDate from "./helpers/parseDate"
 
 import Workout from './models/Workout';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 
 interface Props{
-    workout:Workout
+    workout:Workout,
+    goToEditWorkout:(workout:Workout)=>void
 }
 
-const WorkoutView:React.FC<Props> = ({workout}) => { 
+const WorkoutView:React.FC<Props> = ({workout,goToEditWorkout}) => { 
+
+
+  //Sets workout to be edited as the workout in this component
+  const goToEditWorkoutHandler = () => goToEditWorkout(workout);
+  
 
   return (
     <View style={styles.Container}>
       <View style={styles.DateContainer}>
         <Text style={styles.Date}>{parseDate(workout.workoutDate)}</Text>
-        <Image style={styles.Icon} source={EditIcon} />
+        <TouchableOpacity onPress={goToEditWorkoutHandler}>
+          <Image style={styles.Icon} source={EditIcon} />
+        </TouchableOpacity>
       </View>
       {workout.exercises.map((exercise)=>{
-       return <View style={styles.Exercise}>
+       return <View key={exercise.name} style={styles.Exercise}>
             <Text style={styles.ExerciseName}>{exercise.name}</Text>
             <View style={styles.ExerciseInfo}>
               <Text style={styles.SetsReps}>{exercise.points[0].sets} x {exercise.points[0].reps} </Text>

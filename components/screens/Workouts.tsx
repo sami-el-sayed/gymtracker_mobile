@@ -4,6 +4,7 @@ import {StyleSheet,Text, FlatList, Button, View, TouchableOpacity} from 'react-n
 import {GlobalContext} from "../context/GlobalContext"
 
 import WorkoutView from "../WorkoutView";
+import Workout from '../models/Workout';
 
 
 interface Props 
@@ -13,12 +14,18 @@ interface Props
 
 const Workouts:React.FC<Props> = ({navigation}) => {
  
-  const {workouts} = useContext(GlobalContext)
+  const {workouts,editWorkout} = useContext(GlobalContext)
+
+  const goToEditWorkout = (workout:Workout) => {
+    if(editWorkout) editWorkout(workout)
+    navigation.push("Add Workout")
+  }
 
   return (
     <View style={styles.Container}>
       <Text style={styles.Title}> Here are all your Workouts !</Text>
-      <FlatList style={styles.List} inverted data={workouts} renderItem={({item}) =><WorkoutView workout={item}/>}/>
+      <FlatList style={styles.List} inverted data={workouts} 
+      renderItem={({item}) =><WorkoutView goToEditWorkout={goToEditWorkout} workout={item}/>}/>
       <TouchableOpacity
          style={styles.Button}
          onPress={()=>navigation.push("Add Workout")}
