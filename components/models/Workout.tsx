@@ -1,14 +1,24 @@
 import Exercise from "./Exercise"
+import parseDate from "../helpers/parseDate";
 
 export default class Workout {
     
     id?:number;
-    workoutDate: Date;
+    workoutDate: string;
     exercises: Exercise[];
 
-    constructor(_date: Date,_exercises:Exercise[],_id?:number) {
+    constructor(_date: Date | string,_exercises:Exercise[],_id?:number) {
         if (_id) this.id = _id;
-        this.workoutDate = _date;
+
+
+        if(typeof _date === "string" ){
+          this.workoutDate = _date;
+
+        }
+        else {
+          console.log(_date)
+          console.log(parseDate(_date))
+          this.workoutDate = parseDate(_date)};
         this.exercises = _exercises;
       }
      
@@ -26,8 +36,9 @@ export default class Workout {
 
     //Changes Date of exercises to match workoutDate
     changeDate(){
+      const date = new Date(this.workoutDate)
       for (let i = 0; i < this.exercises.length; i++) {
-        this.exercises[i].points[0].date = this.workoutDate;
+        this.exercises[i].points[0].date = date;
       }
     }
 }

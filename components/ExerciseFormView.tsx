@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Text, StyleSheet, TextInput, Picker, TouchableOpacity, View } from 'react-native';
+import { Text, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
+import {Picker} from "@react-native-community/picker"
 import Point from './models/Point';
 import Exercise from './models/Exercise';
 
@@ -116,7 +117,7 @@ const ExerciseFormView:React.FC<Props> = ({exercise,setShowExerciseForm,addExerc
         <Picker
           selectedValue={exerciseForm.status}
           style={styles.Picker}
-          onValueChange={(itemValue) => onChangeHandler("status",itemValue)}
+          onValueChange={(itemValue) => onChangeHandler("status",itemValue.toString())}
         >
           <Picker.Item label="SUCCESS" value="success" />
           <Picker.Item label="FAIL" value="fail" />

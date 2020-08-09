@@ -1,10 +1,11 @@
-import React, { useContext } from 'react';
-import {StyleSheet,Text, FlatList, Button, View, TouchableOpacity} from 'react-native';
+import React, { useContext,useState } from 'react';
+import {StyleSheet,Text, FlatList, View, TouchableOpacity} from 'react-native';
 
 import {GlobalContext} from "../context/GlobalContext"
 
 import WorkoutView from "../WorkoutView";
 import Workout from '../models/Workout';
+import parseDate from '../helpers/parseDate';
 
 
 interface Props 
@@ -14,21 +15,25 @@ interface Props
 
 const Workouts:React.FC<Props> = ({navigation}) => {
  
-  const {workouts,editWorkout} = useContext(GlobalContext)
+  const {workouts} = useContext(GlobalContext)
 
-  const goToEditWorkout = (workout:Workout) => {
-    if(editWorkout) editWorkout(workout)
-    navigation.push("Add Workout")
+  //Goes to Add Workout Screen
+  //if Workout passed it means we are editing it
+  //Else we are adding a new Workout
+  const goToAddWorkoutHandler = (workout?:Workout) => {
+    if(workout !== undefined) navigation.navigate("Add Workout",{editedWorkout:workout});
+    else navigation.navigate("Add Workout",{editedWorkout:undefined});
   }
 
   return (
     <View style={styles.Container}>
       <Text style={styles.Title}> Here are all your Workouts !</Text>
       <FlatList style={styles.List} inverted data={workouts} 
-      renderItem={({item}) =><WorkoutView goToEditWorkout={goToEditWorkout} workout={item}/>}/>
+      keyExtractor={(item)=> item.workoutDate}
+      renderItem={({item}) =><WorkoutView goToEditWorkout={goToAddWorkoutHandler} workout={item}/>}/>
       <TouchableOpacity
          style={styles.Button}
-         onPress={()=>navigation.push("Add Workout")}
+         onPress={()=>goToAddWorkoutHandler()}
       >
           <Text style={styles.ButtonText}>Add Workout</Text>
       </TouchableOpacity>

@@ -9,18 +9,24 @@ import EditIcon from "../icons/edit_icon.png"
 import Exercise from '../models/Exercise';
 import ExerciseFormView from '../ExerciseFormView';
 import Workout from '../models/Workout';
-import parseDate from '../helpers/parseDate';
 
 interface Props 
 {
   navigation: any;
+  route:any;
 }
 
-const AddWorkout:React.FC<Props> = ({navigation}) => {
+const AddWorkout:React.FC<Props> = ({navigation,route}) => {
 
-  const {addWorkout,editedWorkout,saveEditedWorkout} = useContext(GlobalContext)
+  const {editedWorkout} = route.params;
+  let originalWorkoutDate:Date;
+
+  if(editedWorkout !==undefined) originalWorkoutDate = editedWorkout.workoutDate;
+
+
+  const {addWorkout,saveEditedWorkout} = useContext(GlobalContext)
   
-  const [workoutDate,setWorkoutDate] = useState<Date>( editedWorkout ? editedWorkout.workoutDate :  new Date())
+  const [workoutDate,setWorkoutDate] = useState<Date>( editedWorkout ? new Date(editedWorkout.workoutDate) :  new Date())
   const [dateSet,setDateSet] = useState<boolean>(editedWorkout ? true: false)
   const [showDatePicker,setShowDatePicker] = useState<boolean>(false)
 
@@ -54,13 +60,15 @@ const AddWorkout:React.FC<Props> = ({navigation}) => {
   //If editedWorkout is present means we want to EditWorkout
   //Else if editedWorkout is not present means we want to Add a Workout
   const addOrEditWorkout = () => {
+
     const newWorkout:Workout = new Workout(workoutDate,exercises);
 
     //If Edited workout means we editing so we save the edit
-    if(editedWorkout && saveEditedWorkout )saveEditedWorkout(newWorkout)
+    if(editedWorkout 
+      && saveEditedWorkout 
+      && originalWorkoutDate ) saveEditedWorkout(newWorkout,originalWorkoutDate)
     //ese we are adding a new Workout
     else if(addWorkout) addWorkout(newWorkout)
-
     navigation.push("Workouts") 
   }
 
@@ -94,15 +102,14 @@ const AddWorkout:React.FC<Props> = ({navigation}) => {
     setShowExerciseForm(true)
   }
 
-  
-  
+
 
   //Todo Reformat this piece of trash
   return (
     <KeyboardAvoidingView behavior="position" enabled={keyboardEnabled} style={styles.Container}>
      <Text style={styles.Title}> Add your new workout!</Text>
       {showDatePicker && (
-        <DateTimePicker  mode="date" value={workoutDate ? workoutDate : new Date()} onChange={(event,date)=>onDateChange(event,date)} />
+        <DateTimePicker maximumDate={new Date()}  mode="date" value={workoutDate ? workoutDate : new Date()} onChange={(event,date)=>onDateChange(event,date)} />
       )}
      {dateSet === false ?
      <View>
@@ -118,7 +125,7 @@ const AddWorkout:React.FC<Props> = ({navigation}) => {
     {showExerciseForm === false ?
      <View>
        <View style={styles.DateContainer}>
-        <Text style={styles.Date}>{parseDate(workoutDate)}</Text>
+        <Text style={styles.Date}>{workoutDate.toDateString()}</Text>
         <TouchableOpacity onPress={()=>setShowDatePicker(true)}>
           <Image style={styles.Icon} source={EditIcon} />
         </TouchableOpacity>

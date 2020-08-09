@@ -1,15 +1,18 @@
-import React,{createContext, useState} from "react"
+import React,{createContext, useState,useEffect} from "react"
 import dummyWorkouts from "../dummyData/dummyWorkouts"
-import dummyExercises from "../dummyData/dummyExercises"
-import Workout from "components/models/Workout"
+import Workout from "../models/Workout"
+import LoadExercisesFromStorage from "../helpers/LoadExercisesFromStorage"
+import AddExercisesToStorage from "../helpers/AddExerciseToStorage"
+import getMonthYear from "../helpers/getMonthYear"
+import AddWorkoutToStorage from "../helpers/AddWorkoutToStorage"
+import LoadWorkoutsFromStorage from "../helpers/LoadWorkoutsFromStorage"
+import editWorkoutToStorage from "../helpers/editWorkoutToStorage"
 
 
 interface ContextProps{
     workouts:Workout[],
-    editedWorkout:Workout,
     addWorkout:(workoutToAdd:Workout)=>void,
-    editWorkout:(workout:Workout) => void,
-    saveEditedWorkout:(workout:Workout) =>void
+    saveEditedWorkout:(workout:Workout,originalWorkoutDate:Date) =>void
     exercises:string[],
     addExercise:(exercise:string)=>void
 }
@@ -18,48 +21,58 @@ export const GlobalContext = createContext<Partial<ContextProps>>({})
 
 export const GlobalProvider: React.FunctionComponent = (props) => {
 
-    const [workouts,setWorkouts] = useState<Workout[]>(dummyWorkouts)
-    const [editedWorkout,setEditedWorkout] = useState<Workout|undefined>(undefined)
-
-    const [exercises,setExercises] = useState<string[]>(dummyExercises)
 
 
+    const [workouts,setWorkouts] = useState<Workout[]>([])
 
-    function addWorkout(workoutToAdd:Workout) {
-        //let added = await AddWorkoutToStorage
-        setWorkouts([...workouts,workoutToAdd])
+
+    const [exercises,setExercises] = useState<string[]>([])
+
+
+    useEffect(()=>{
+        intialLoad();
+    },[])
+
+    async function intialLoad(){
+        await loadExercises();
+        await loadWorkouts();
     }
 
-    function loadWorkouts() {
-
+    async function addWorkout(workoutToAdd:Workout) {
+        const result:[boolean,string?] = await AddWorkoutToStorage(workoutToAdd);
+        const added:boolean = result[0];
+        if(added === true) setWorkouts([...workouts,workoutToAdd])    
+    
     }
 
-    function loadExercises(){
-
+    async function loadWorkouts() {
+        const result:[Workout[],string?] = await LoadWorkoutsFromStorage();
+        const workouts:Workout[] = result[0];
+        setWorkouts(workouts);
+        console.log(workouts)
     }
 
-    function addExercise(exercise:string){
-        //let added = await AddExerciseToStorage
-        setExercises([...exercises,exercise])
+    
+
+    async function loadExercises(){
+        const result:[string[],string?] = await LoadExercisesFromStorage();
+        const exercises = result[0];
+        setExercises(exercises)
     }
 
-    const editWorkout = (workout:Workout) => {
-        setEditedWorkout(workout)
+    async function addExercise(exercise:string){
+        if(exercises.includes(exercise)) return;
+        const newExercises:string[] = [...exercises,exercise]
+        const result:[boolean,string?] = await AddExercisesToStorage(newExercises);
+        const added:boolean = result[0]
+        if(added === true) setExercises(newExercises)
+        
     }
 
-    const saveEditedWorkout = (workout:Workout) => {
+    const saveEditedWorkout = async (workout:Workout,originalWorkoutDate:Date) => {
+        
+        const result = await editWorkoutToStorage(workout,originalWorkoutDate);
 
-        if(editedWorkout === undefined) return
-        const workoutsCopy:Workout[] = workouts.slice();
-
-        for (let i = 0; i < workouts.length; i++) {
-            if(workoutsCopy[i].workoutDate === editedWorkout.workoutDate){
-                workoutsCopy[i] = workout;
-            }   
-        }
-
-        setEditedWorkout(undefined)
-        setWorkouts(workoutsCopy)
     }
 
 
@@ -68,8 +81,6 @@ export const GlobalProvider: React.FunctionComponent = (props) => {
         <GlobalContext.Provider
         value={{
             workouts,
-            editedWorkout,
-            editWorkout,
             saveEditedWorkout,
             addWorkout,
             exercises,

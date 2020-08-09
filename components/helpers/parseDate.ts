@@ -5,8 +5,9 @@ Thu May 07 2020
 */
 
 function parseDate(date:Date):string {
+    
     let dateStr:string = date.toString().split(":")[0];
-    dateStr = dateStr.substr(0,dateStr.length-2)
+    dateStr = dateStr.substr(0,dateStr.length-3)
     return dateStr;
 }
 

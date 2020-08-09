@@ -24,7 +24,7 @@ const WorkoutView:React.FC<Props> = ({workout,goToEditWorkout}) => {
   return (
     <View style={styles.Container}>
       <View style={styles.DateContainer}>
-        <Text style={styles.Date}>{parseDate(workout.workoutDate)}</Text>
+        <Text style={styles.Date}>{workout.workoutDate}</Text>
         <TouchableOpacity onPress={goToEditWorkoutHandler}>
           <Image style={styles.Icon} source={EditIcon} />
         </TouchableOpacity>

@@ -1,6 +1,7 @@
 import React,{useState, useContext} from 'react';
 import {GlobalContext} from "../context/GlobalContext"
 import {StyleSheet,Text, FlatList, Button, TextInput, View, TouchableOpacity} from 'react-native';
+import clearAppData from '../helpers/clearAppData';
 
 interface Props{
   navigation:any
@@ -25,7 +26,16 @@ const Exercises:React.FC<Props> = ({navigation}) => {
   return (
     <View style={styles.Container}>
       <Text style={styles.Title}> Add All your Exercises and track your progress! </Text>
+      <TouchableOpacity
+      style={styles.Button}
+      onPress={()=>clearAppData()} 
+     >
+       <Text>
+          CLEAR APP DATA DEBUG
+       </Text>
+    </TouchableOpacity>
       <FlatList
+        keyExtractor={(item)=>item.toString()}
         style={styles.List}
         data={exercises} 
         renderItem={({item}) => 
@@ -85,12 +95,13 @@ const styles = StyleSheet.create({
   },
   TextInput:{
     backgroundColor:"#3b3b3b",
-    color:"#fff"
+    color:"#fff",
   },
   Button:{
     alignItems: 'center',
     backgroundColor: '#3b3b3b',
     padding: 10,
+    marginTop:5,
   },
   ButtonText:{
     fontSize:16,
