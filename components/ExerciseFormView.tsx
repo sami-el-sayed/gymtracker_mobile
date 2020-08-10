@@ -6,6 +6,7 @@ import Exercise from './models/Exercise';
 
 interface Props{
     exercise?:Exercise,
+    exerciseNames:string[] | undefined,
     editExercise:(exercise:Exercise)=>void,
     addExerciseToWorkout:(exercise:Exercise) => void,
     setShowExerciseForm:Function,
@@ -14,7 +15,7 @@ interface Props{
 
 //View for adding Exercises to Workout
 //Exercise Can be Passed for editing it 
-const ExerciseFormView:React.FC<Props> = ({exercise,setShowExerciseForm,addExerciseToWorkout,editExercise,setKeyboardEnabled}) => {
+const ExerciseFormView:React.FC<Props> = ({exerciseNames, exercise,setShowExerciseForm,addExerciseToWorkout,editExercise,setKeyboardEnabled}) => {
     
  //If Exercise is passed loads exercise parameters into form
  const [exerciseForm,setExerciseForm] = useState({
@@ -82,12 +83,19 @@ const ExerciseFormView:React.FC<Props> = ({exercise,setShowExerciseForm,addExerc
   return (
     <>
       <Text style={styles.Title}>Exercise Name</Text>
-      <TextInput
-          style={styles.TextInput}
-          onFocus={()=>setKeyboardEnabled(false)}
-          onChangeText={(text:string) => onChangeHandler("name",text)}
-          value={exerciseForm.name}
-      />
+      <View style={styles.PickerView}>
+        <Picker
+           selectedValue={exerciseForm.name}
+           style={styles.Picker}
+           onValueChange={(itemValue) => onChangeHandler("name",itemValue.toString())}
+         >
+           {exerciseNames && (exerciseNames.map((exerciseName)=>{
+                 return(
+                       <Picker.Item key={exerciseName} label={exerciseName} value={exerciseName} />
+                 )
+           }))}          
+        </Picker>
+      </View>
       <Text style={styles.Title}>Sets</Text>
       <TextInput
           keyboardType="numeric"

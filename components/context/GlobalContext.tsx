@@ -1,12 +1,13 @@
 import React,{createContext, useState,useEffect} from "react"
-import dummyWorkouts from "../dummyData/dummyWorkouts"
 import Workout from "../models/Workout"
 import LoadExercisesFromStorage from "../helpers/LoadExercisesFromStorage"
 import AddExercisesToStorage from "../helpers/AddExerciseToStorage"
-import getMonthYear from "../helpers/getMonthYear"
 import AddWorkoutToStorage from "../helpers/AddWorkoutToStorage"
 import LoadWorkoutsFromStorage from "../helpers/LoadWorkoutsFromStorage"
 import editWorkoutToStorage from "../helpers/editWorkoutToStorage"
+import getAllQuartersAndYearsSorted from "../helpers/getAllQuartersAndYearsSorted"
+import removeWorkoutFromStorage from "../helpers/removeWorkoutFromStorage"
+import checkIfExerciseExists from "../helpers/checkIfExerciseExists"
 
 
 interface ContextProps{
@@ -14,7 +15,8 @@ interface ContextProps{
     addWorkout:(workoutToAdd:Workout)=>void,
     saveEditedWorkout:(workout:Workout,originalWorkoutDate:Date) =>void
     exercises:string[],
-    addExercise:(exercise:string)=>void
+    addExercise:(exercise:string)=>void,
+    deleteWorkout:(workoutToRemove:Workout)=>void
 }
 
 export const GlobalContext = createContext<Partial<ContextProps>>({})
@@ -28,14 +30,39 @@ export const GlobalProvider: React.FunctionComponent = (props) => {
 
     const [exercises,setExercises] = useState<string[]>([])
 
+    const [quarters,setQuarters] = useState<string[]>([])
 
+    //Initially loads quarters and exercises
     useEffect(()=>{
         intialLoad();
     },[])
 
     async function intialLoad(){
         await loadExercises();
-        await loadWorkouts();
+        await loadQuarters();
+    }
+
+
+    //When quarters are loaded it loads workouts based on those quarters
+    useEffect(()=>{
+        if(quarters.length > 0 && workouts.length===0){
+            initialWorkoutsLoad();
+        }
+    },[quarters])
+
+    //Initial load of Workouts
+    //If there is more than 20 workouts it breaks the loop
+
+    async function initialWorkoutsLoad(){
+        let workouts:Workout[] = [];
+
+        for (let i:number = 0; i < quarters.length; i++) {
+            const result:[Workout[],string?] = await LoadWorkoutsFromStorage(quarters[i]);
+            workouts = workouts.concat(result[0]);
+            if(workouts.length > 20 ) break;                
+        }
+
+        setWorkouts(workouts);
     }
 
     async function addWorkout(workoutToAdd:Workout) {
@@ -45,11 +72,9 @@ export const GlobalProvider: React.FunctionComponent = (props) => {
     
     }
 
+    
     async function loadWorkouts() {
-        const result:[Workout[],string?] = await LoadWorkoutsFromStorage();
-        const workouts:Workout[] = result[0];
-        setWorkouts(workouts);
-        console.log(workouts)
+        
     }
 
     
@@ -60,19 +85,43 @@ export const GlobalProvider: React.FunctionComponent = (props) => {
         setExercises(exercises)
     }
 
-    async function addExercise(exercise:string){
-        if(exercises.includes(exercise)) return;
-        const newExercises:string[] = [...exercises,exercise]
-        const result:[boolean,string?] = await AddExercisesToStorage(newExercises);
-        const added:boolean = result[0]
-        if(added === true) setExercises(newExercises)
-        
+    async function loadQuarters(){
+        const sortedQuarters:string[] = await getAllQuartersAndYearsSorted();
+        setQuarters(sortedQuarters);
     }
+
+    
 
     const saveEditedWorkout = async (workout:Workout,originalWorkoutDate:Date) => {
         
         const result = await editWorkoutToStorage(workout,originalWorkoutDate);
 
+    }
+
+    const deleteWorkout = async (workoutToRemove:Workout) => {
+        const result:[boolean,string?] = await removeWorkoutFromStorage(new Date(workoutToRemove.workoutDate));
+        if(result[0]===true){
+            setWorkouts(workouts.filter((workout)=>workout.workoutDate !== workoutToRemove.workoutDate ))
+        }
+
+    }
+
+    async function addExercise(exercise:string){
+        const duplicateExists:boolean = checkIfExerciseExists(exercises,exercise)
+
+        if(duplicateExists === false){
+
+            const newExercises:string[] = [...exercises,exercise]
+            const result:[boolean,string?] = await AddExercisesToStorage(newExercises);
+            const added:boolean = result[0]
+            if(added === true) setExercises(newExercises)    
+
+        }
+        
+    }
+
+    async function deleteExecise(exercise:string){
+        
     }
 
 
@@ -85,6 +134,7 @@ export const GlobalProvider: React.FunctionComponent = (props) => {
             addWorkout,
             exercises,
             addExercise,
+            deleteWorkout
 
         }}
         >

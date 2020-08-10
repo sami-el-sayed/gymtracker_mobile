@@ -24,13 +24,13 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
   if(editedWorkout !==undefined) originalWorkoutDate = editedWorkout.workoutDate;
 
 
-  const {addWorkout,saveEditedWorkout} = useContext(GlobalContext)
+  const {addWorkout,saveEditedWorkout,exercises} = useContext(GlobalContext)
   
   const [workoutDate,setWorkoutDate] = useState<Date>( editedWorkout ? new Date(editedWorkout.workoutDate) :  new Date())
   const [dateSet,setDateSet] = useState<boolean>(editedWorkout ? true: false)
   const [showDatePicker,setShowDatePicker] = useState<boolean>(false)
 
-  const [exercises,setExercises] = useState<Exercise[]>(editedWorkout ? editedWorkout.exercises : [])
+  const [localExercises,setLocalExercises] = useState<Exercise[]>(editedWorkout ? editedWorkout.exercises : [])
   const [showExerciseForm,setShowExerciseForm] = useState<boolean>(false)
   const [exerciseToEdit,setExerciseToEdit] = useState<Exercise | undefined>(undefined)
 
@@ -39,11 +39,11 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
   //Thanks to this exercises can be edited 
   useEffect(()=>{
     if(editedWorkout){ 
-      const exercisesCopy = exercises.slice();
-      for (let i = 0; i < exercises.length; i++) {
+      const exercisesCopy = localExercises.slice();
+      for (let i = 0; i < localExercises.length; i++) {
         exercisesCopy[i].id = i;
       }
-      setExercises(exercisesCopy);
+      setLocalExercises(exercisesCopy);
     }
   },[editedWorkout])
 
@@ -61,7 +61,7 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
   //Else if editedWorkout is not present means we want to Add a Workout
   const addOrEditWorkout = () => {
 
-    const newWorkout:Workout = new Workout(workoutDate,exercises);
+    const newWorkout:Workout = new Workout(workoutDate,localExercises);
 
     //If Edited workout means we editing so we save the edit
     if(editedWorkout 
@@ -80,8 +80,8 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
 
   //Adds Exercise to Workout Exercises Array
   const addExerciseToWorkout = (exercise:Exercise) => {
-    exercise.id = exercises.length;
-    setExercises([...exercises,exercise])
+    exercise.id = localExercises.length;
+    setLocalExercises([...localExercises,exercise])
   }
 
 
@@ -90,10 +90,10 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
     if(exerciseToEdit === undefined) return
     if(exerciseToEdit.id === undefined) return
 
-    const exercisesCopy:Exercise[] = exercises.slice();
+    const exercisesCopy:Exercise[] = localExercises.slice();
     exercisesCopy[exerciseToEdit.id] = exercise;
 
-    setExercises(exercisesCopy);
+    setLocalExercises(exercisesCopy);
   } 
 
   //Sets Exercise to Edit
@@ -130,7 +130,8 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
           <Image style={styles.Icon} source={EditIcon} />
         </TouchableOpacity>
        </View>
-       <FlatList data={exercises} 
+       <FlatList data={localExercises} 
+       keyExtractor={(item)=>item.name}
        renderItem={({item})=>
        <View style={styles.ExerciseContainer}>
          <Text style={styles.Exercise}>{item.name}</Text>
@@ -145,7 +146,7 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
       >
           <Text style={styles.ButtonText}>Add Exercise</Text>
       </TouchableOpacity>
-       {exercises.length > 0 ? 
+       {localExercises.length > 0 ? 
          <TouchableOpacity
          style={styles.ButtonWithMargin}
          onPress={addOrEditWorkout}
@@ -159,6 +160,7 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
      </View>
      :
      <ExerciseFormView
+     exerciseNames={exercises}
      exercise={exerciseToEdit}
      editExercise={editExercise}
      addExerciseToWorkout={addExerciseToWorkout} 

@@ -15,7 +15,7 @@ interface Props
 
 const Workouts:React.FC<Props> = ({navigation}) => {
  
-  const {workouts} = useContext(GlobalContext)
+  const {workouts,deleteWorkout} = useContext(GlobalContext)
 
   //Goes to Add Workout Screen
   //if Workout passed it means we are editing it
@@ -25,12 +25,21 @@ const Workouts:React.FC<Props> = ({navigation}) => {
     else navigation.navigate("Add Workout",{editedWorkout:undefined});
   }
 
+  const deleteWorkoutHandler = (workout:Workout) => {
+    if(deleteWorkout) deleteWorkout(workout)
+  }
+
   return (
     <View style={styles.Container}>
       <Text style={styles.Title}> Here are all your Workouts !</Text>
       <FlatList style={styles.List} inverted data={workouts} 
       keyExtractor={(item)=> item.workoutDate}
-      renderItem={({item}) =><WorkoutView goToEditWorkout={goToAddWorkoutHandler} workout={item}/>}/>
+      renderItem={({item}) =>
+      <WorkoutView 
+      deleteWorkout={deleteWorkoutHandler}
+      goToEditWorkout={goToAddWorkoutHandler} 
+      workout={item}/>}
+      />
       <TouchableOpacity
          style={styles.Button}
          onPress={()=>goToAddWorkoutHandler()}

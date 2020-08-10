@@ -2,8 +2,9 @@ import React from 'react';
 import {StyleSheet,Text, View, Image} from 'react-native';
 
 import EditIcon from "./icons/edit_icon.png";
+import DeleteIcon from "./icons/delete_icon.png";
 
-import parseDate from "./helpers/parseDate"
+
 
 import Workout from './models/Workout';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -11,14 +12,19 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 
 interface Props{
     workout:Workout,
-    goToEditWorkout:(workout:Workout)=>void
+    goToEditWorkout:(workout:Workout)=>void,
+    deleteWorkout:(workout:Workout)=>void | undefined,
 }
 
-const WorkoutView:React.FC<Props> = ({workout,goToEditWorkout}) => { 
+const WorkoutView:React.FC<Props> = ({workout,goToEditWorkout,deleteWorkout}) => { 
 
 
   //Sets workout to be edited as the workout in this component
   const goToEditWorkoutHandler = () => goToEditWorkout(workout);
+
+  const deleteWorkoutHandler = () => {
+    deleteWorkout(workout);
+  }
   
 
   return (
@@ -27,6 +33,9 @@ const WorkoutView:React.FC<Props> = ({workout,goToEditWorkout}) => {
         <Text style={styles.Date}>{workout.workoutDate}</Text>
         <TouchableOpacity onPress={goToEditWorkoutHandler}>
           <Image style={styles.Icon} source={EditIcon} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={deleteWorkoutHandler}>
+          <Image style={styles.Icon} source={DeleteIcon} />
         </TouchableOpacity>
       </View>
       {workout.exercises.map((exercise)=>{
@@ -56,6 +65,7 @@ const styles = StyleSheet.create({
     width:15,
     height:15,
     marginLeft:5,
+    marginRight:15
   },
   DateContainer:{
     backgroundColor : "#3b3b3b",

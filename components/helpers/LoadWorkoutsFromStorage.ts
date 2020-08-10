@@ -1,16 +1,12 @@
 import AsyncStorage from "@react-native-community/async-storage"
 
 import Workout from "components/models/Workout"
-import getMonthYear from "./getMonthYear"
 
-const LoadWorkoutsFromStorage = async () : Promise<[Workout[],string?]> => {
+const LoadWorkoutsFromStorage = async (dateKey:string) : Promise<[Workout[],string?]> => {
 
-    const dateKey:string = getMonthYear(new Date());
-
-    console.log(dateKey)
 
     try {
-        const workoutsString:string | null = await AsyncStorage.getItem(`${dateKey}-workouts`)
+        const workoutsString:string | null = await AsyncStorage.getItem(dateKey)
         if(workoutsString !== null ){
             const workoutsOBJ = await JSON.parse(workoutsString)
             return [workoutsOBJ.workouts]

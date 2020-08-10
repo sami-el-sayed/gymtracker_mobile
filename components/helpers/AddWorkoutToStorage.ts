@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-community/async-storage"
 import Workout from "../models/Workout"
 import getMonthYear from "./getMonthYear";
+import checkIfWorkoutExists from "./checkIfWorkoutExists";
 
 const AddWorkoutToStorage = async (workout:Workout) : Promise<[boolean,string?]> => {
 
@@ -27,6 +28,13 @@ const AddWorkoutToStorage = async (workout:Workout) : Promise<[boolean,string?]>
 
         else{
             const workouts:Workout[] = await JSON.parse(workoutsStr).workouts;
+
+            const foundDuplicate:boolean = checkIfWorkoutExists(workouts,workout.workoutDate)
+
+            if(foundDuplicate === true){
+                return [false,`You already have a workout on this day`]
+            }
+
             workouts.push(workout)
 
             const workoutsObj = {
