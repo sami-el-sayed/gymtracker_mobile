@@ -10,16 +10,11 @@ export default class Workout {
     constructor(_date: Date | string,_exercises:Exercise[],_id?:number) {
         if (_id) this.id = _id;
 
+        if(typeof _date === "string" ) this.workoutDate = _date;
+        else this.workoutDate = parseDate(_date);
 
-        if(typeof _date === "string" ){
-          this.workoutDate = _date;
-
-        }
-        else {
-          console.log(_date)
-          console.log(parseDate(_date))
-          this.workoutDate = parseDate(_date)};
         this.exercises = _exercises;
+
       }
      
     //Adds Exercise to exercise array

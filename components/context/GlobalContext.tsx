@@ -14,8 +14,11 @@ import removeExerciseFromStorage from "../helpers/removeExerciseFromStorage"
 
 interface ContextProps{
     workouts:Workout[],
+    loadWorkouts:()=>void,
     addWorkout:(workoutToAdd:Workout)=>void,
-    saveEditedWorkout:(workout:Workout,originalWorkoutDate:Date) =>void
+    saveEditedWorkout:(workout:Workout,originalWorkoutDate:Date) =>void,
+    quarters:string[],
+    currentQuarterIdx:number,
     exercises:string[],
     addExercise:(exercise:string)=>void,
     deleteExecise:(exercise:string) => void,
@@ -58,23 +61,28 @@ export const GlobalProvider: React.FunctionComponent = (props) => {
     //If there is more than 20 workouts it breaks the loop
 
     async function initialWorkoutsLoad(){
-        let workouts:Workout[] = [];
-        let currentQuarterIdx:number = 0;
+        const workoutsTemp = workouts.slice();
+        const loadedWorkouts = await LoadWorkoutsLoop(0);
+        setWorkouts(workoutsTemp.concat(loadedWorkouts));
+    }
 
-        for (let i:number = 0; i < quarters.length; i++) {
+    async function LoadWorkoutsLoop(startInt:number): Promise<Workout[]>{
+        let workouts:Workout[] = [];
+
+        for (let i:number = startInt; i < quarters.length; i++) {
             const result:[Workout[],string?] = await LoadWorkoutsFromStorage(quarters[i]);
             workouts = workouts.concat(result[0]);
-            currentQuarterIdx = i;
             if(workouts.length > 40 ) break;                
         }
 
-        setcurrentQuarterIdx(currentQuarterIdx);
+        setcurrentQuarterIdx(currentQuarterIdx+1);
 
-        setWorkouts(workouts);
+        return workouts;
+
     }
 
     async function addWorkout(workoutToAdd:Workout) {
-        const result:[boolean,string?] = await AddWorkoutToStorage(workoutToAdd);
+        const result:[boolean,string?] = await AddWorkoutToStorage(workoutToAdd,false);
         const added:boolean = result[0];
         if(added === true) setWorkouts([...workouts,workoutToAdd])    
     
@@ -85,7 +93,9 @@ export const GlobalProvider: React.FunctionComponent = (props) => {
         //Checks if atleast 40 workouts have been initially loaded
         if(workouts.length < 40) return;
         else{
-
+            const workoutsTemp = workouts.slice();
+            const loadedWorkouts = await LoadWorkoutsLoop(currentQuarterIdx);
+            setWorkouts(workoutsTemp.concat(loadedWorkouts));
         }
     }
 
@@ -94,6 +104,7 @@ export const GlobalProvider: React.FunctionComponent = (props) => {
     async function loadExercises(){
         const result:[string[],string?] = await LoadExercisesFromStorage();
         const exercises = result[0];
+        console.log(result)
         setExercises(exercises)
     }
 
@@ -142,9 +153,12 @@ export const GlobalProvider: React.FunctionComponent = (props) => {
     return (
         <GlobalContext.Provider
         value={{
+            quarters,
+            currentQuarterIdx,
             workouts,
             saveEditedWorkout,
             addWorkout,
+            loadWorkouts,
             exercises,
             addExercise,
             deleteExecise,

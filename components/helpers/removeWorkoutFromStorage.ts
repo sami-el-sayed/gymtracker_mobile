@@ -3,28 +3,41 @@ import AsyncStorage from "@react-native-community/async-storage"
 import Workout from "../models/Workout"
 import getMonthYear from "./getMonthYear"
 import parseDate from "./parseDate";
+import matchWorkouts from "./matchWorkouts";
 
-const removeWorkoutFromStorage = async (workoutDate:Date) : Promise<[boolean,string?]> => {
-    const finalKey:string = `${getMonthYear(workoutDate)}-workouts`;
-    console.log(finalKey)
-    const workoutDateStr = parseDate(workoutDate);
+
+
+//Removes Workout from Storage
+//Can be given a Workout that has to be kept even with the same date
+const removeWorkoutFromStorage = async (DateToRemove:Date,workoutToKeep?:Workout) : Promise<[boolean,string?]> => {
+
+    const finalKey:string = `${getMonthYear(DateToRemove)}-workouts`;
+    const workoutDateStr = parseDate(DateToRemove);
 
     try {
         const workoutsString:string | null = await AsyncStorage.getItem(finalKey)
 
 
         if(workoutsString !== null ){
-            
-            let workouts:Workout[] = await JSON.parse(workoutsString).workouts
-            workouts = workouts.filter((workout)=> {
-                console.log("WORKOUT FILTERED DATE" + workout.workoutDate)
-                console.log("WORKOUT TO DELETE" + workoutDateStr)
-                return workout.workoutDate !== workoutDateStr
-            });
 
+            let filteredWorkouts:Workout[] = [];
+            const workouts:Workout[] = await JSON.parse(workoutsString).workouts
+
+            //Filters Workouts based on Date
+            //if Workout to kept was given searches it in the loop and laters matches it 
+            for (let i = 0; i < workouts.length; i++) {
+                console.log(workouts[i]);
+
+                if(workouts[i].workoutDate !== workoutDateStr) filteredWorkouts.push(workouts[i])
+                
+                else if(workoutToKeep !== undefined){
+                    if(matchWorkouts(workouts[i],workoutToKeep) === true ) filteredWorkouts.push(workouts[i])
+                }
+
+            }
     
 
-            if(workouts.length === 0) {
+            if(filteredWorkouts.length === 0) {
 
                 await AsyncStorage.removeItem(finalKey);
                 return [true];
@@ -32,7 +45,7 @@ const removeWorkoutFromStorage = async (workoutDate:Date) : Promise<[boolean,str
 
             else{   
                 const workoutsObj = {
-                    workouts:workouts
+                    workouts:filteredWorkouts
                 }
 
                 await AsyncStorage.setItem(finalKey,await JSON.stringify(workoutsObj))

@@ -14,7 +14,7 @@ interface Props
 
 const Workouts:React.FC<Props> = ({navigation}) => {
  
-  const {workouts,deleteWorkout} = useContext(GlobalContext)
+  const {workouts,deleteWorkout,loadWorkouts} = useContext(GlobalContext)
 
   //Goes to Add Workout Screen
   //if Workout passed it means we are editing it
@@ -23,6 +23,9 @@ const Workouts:React.FC<Props> = ({navigation}) => {
     if(workout !== undefined) navigation.navigate("Add Workout",{editedWorkout:workout});
     else navigation.navigate("Add Workout",{editedWorkout:undefined});
   }
+
+  //When top of the list is reached tries to download more Workouts
+  const loadWorkoutsHandler = () => loadWorkouts && loadWorkouts();
 
   const deleteWorkoutHandler = (workout:Workout) => {
 
@@ -50,7 +53,7 @@ const Workouts:React.FC<Props> = ({navigation}) => {
       style={styles.List}
       inverted data={workouts} 
       keyExtractor={(item)=> item.workoutDate}
-      onEndReached={()=>console.log("End Reached")}
+      onEndReached={loadWorkoutsHandler}
       renderItem={({item}) =>
       <WorkoutView 
       deleteWorkout={deleteWorkoutHandler}

@@ -3,7 +3,9 @@ import Workout from "../models/Workout"
 import getMonthYear from "./getMonthYear";
 import checkIfWorkoutExists from "./checkIfWorkoutExists";
 
-const AddWorkoutToStorage = async (workout:Workout) : Promise<[boolean,string?]> => {
+//Adds workout to storage
+//If Workout is being edited doesnt check if such workout already exists
+const AddWorkoutToStorage = async (workout:Workout,edited:boolean) : Promise<[boolean,string?]> => {
 
     const dateKey:string = getMonthYear(new Date(workout.workoutDate));
 
@@ -29,13 +31,18 @@ const AddWorkoutToStorage = async (workout:Workout) : Promise<[boolean,string?]>
         else{
             const workouts:Workout[] = await JSON.parse(workoutsStr).workouts;
 
-            const foundDuplicate:boolean = checkIfWorkoutExists(workouts,workout.workoutDate)
+            if(edited === false){
+                const foundDuplicate:boolean = checkIfWorkoutExists(workouts,workout.workoutDate)
 
-            if(foundDuplicate === true){
-                return [false,`You already have a workout on this day`]
+                if(foundDuplicate === true){
+                    return [false,`You already have a workout on this day`]
+                }    
             }
 
             workouts.push(workout)
+
+            console.log("workouts")
+            console.log(workouts)
 
             const workoutsObj = {
                 workouts:workouts

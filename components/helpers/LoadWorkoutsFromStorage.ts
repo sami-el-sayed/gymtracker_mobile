@@ -5,7 +5,6 @@ import sortWorkouts from "./sortWorkouts"
 
 const LoadWorkoutsFromStorage = async (dateKey:string) : Promise<[Workout[],string?]> => {
 
-
     try {
         const workoutsString:string | null = await AsyncStorage.getItem(dateKey)
         if(workoutsString !== null ){
