@@ -25,7 +25,7 @@ const ExerciseDetail:React.FC<Props> = ({route}) => {
   },[workouts])
 
   //Sort points by Date
-  const sortPoints = (pointsArr:Point[]):Point[] => pointsArr.sort((a,b)=>a.date.getTime()-b.date.getTime())
+  const sortPoints = (pointsArr:Point[]):Point[] => pointsArr.sort((a,b)=>b.date.getTime()-a.date.getTime())
 
   //Loads All the Points found in the Workouts Storage
   const loadPoints = async () => {

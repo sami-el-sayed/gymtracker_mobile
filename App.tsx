@@ -20,7 +20,17 @@ const App = () => {
   return (
     <GlobalProvider>
       <NavigationContainer>
-        <Tabs.Navigator>
+        <Tabs.Navigator
+        tabBarOptions={{
+          activeBackgroundColor:"#171717",
+          inactiveBackgroundColor:"#292929",
+          activeTintColor: 'tomato',
+          inactiveTintColor: 'gray',
+          labelStyle:{
+            fontSize:14
+          }
+        }}
+        >
           <Tabs.Screen name="Exercises" component={ExercisesStackScreen as any} />
           <Tabs.Screen name="Workouts" component={WorkoutsStackScreen as any} />
           <Tabs.Screen name="Profile" component={Profile} />

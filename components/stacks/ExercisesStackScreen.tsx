@@ -10,8 +10,31 @@ const ExercisesStack = createStackNavigator();
 const ExercisesStackScreen = () => {
    return (
     <ExercisesStack.Navigator>
-        <ExercisesStack.Screen name="Exercises" component = {Exercises} />
-        <ExercisesStack.Screen name="ExerciseDetail" component = {ExerciseDetail} />
+        <ExercisesStack.Screen name="Exercises" component = {Exercises} 
+         options={{
+            title: 'Exercises',
+            headerStyle: {
+              backgroundColor: '#292929',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              alignSelf:"center",
+              fontWeight: 'bold',
+            },
+          }}
+        />
+        <ExercisesStack.Screen name="ExerciseDetail" component = {ExerciseDetail} 
+         options={{
+            title: 'Details',
+            headerStyle: {
+              backgroundColor: '#292929',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          }}
+        />
     </ExercisesStack.Navigator>
     )
 }

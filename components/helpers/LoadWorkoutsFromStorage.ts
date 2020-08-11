@@ -10,6 +10,7 @@ const LoadWorkoutsFromStorage = async (dateKey:string) : Promise<[Workout[],stri
         if(workoutsString !== null ){
             const workoutsOBJ = await JSON.parse(workoutsString)
             const sortedWorkouts = sortWorkouts(workoutsOBJ.workouts)
+            console.log(sortedWorkouts)
             return [sortedWorkouts]
         }
         else return [[]]

@@ -26,7 +26,6 @@ const removeWorkoutFromStorage = async (DateToRemove:Date,workoutToKeep?:Workout
             //Filters Workouts based on Date
             //if Workout to kept was given searches it in the loop and laters matches it 
             for (let i = 0; i < workouts.length; i++) {
-                console.log(workouts[i]);
 
                 if(workouts[i].workoutDate !== workoutDateStr) filteredWorkouts.push(workouts[i])
                 

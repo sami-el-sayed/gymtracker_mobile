@@ -12,7 +12,7 @@ const editWorkoutToStorage = async (workout:Workout,originalDate:Date) : Promise
 
         if(workoutAdded[0] === true) {
 
-            const workoutRemoved = await removeWorkoutFromStorage(originalDate,workout);
+            const workoutRemoved = await removeWorkoutFromStorage(originalDate,dateChanged ? undefined : workout);
 
             if(workoutRemoved[0] === false) return [false,`An error occured: ${workoutRemoved[1]}`];
 

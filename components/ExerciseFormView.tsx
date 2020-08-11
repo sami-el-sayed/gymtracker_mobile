@@ -68,7 +68,7 @@ const ExerciseFormView:React.FC<Props> = ({exerciseNames, exercise,setShowExerci
         new Date(),
         parseInt(exerciseForm.sets),
         parseInt(exerciseForm.reps),
-        parseInt(exerciseForm.weight),
+        parseFloat(exerciseForm.weight),
         exerciseForm.status,
     )
 

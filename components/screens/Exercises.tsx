@@ -1,4 +1,4 @@
-import React,{useState, useContext} from 'react';
+import React,{useState, useContext,useEffect} from 'react';
 import {GlobalContext} from "../context/GlobalContext"
 import {StyleSheet,Text, FlatList, TextInput, View, TouchableOpacity, Image, Alert} from 'react-native';
 import clearAppData from '../helpers/clearAppData';
@@ -13,10 +13,19 @@ interface Props{
 const Exercises:React.FC<Props> = ({navigation}) => {
 
  const {exercises,addExercise,deleteExecise} = useContext(GlobalContext)
+ const [filteredExercises,setFilteredExercises] = useState<string[]>([]);
 
  const [showAddExercise,setShowAddExercise] = useState<boolean>(false)
 
  const [exerciseToAdd,setExerciseToAdd] = useState<string>("");
+ const [searchedExercise,setSearchedExercise] = useState<string>("");
+
+
+ useEffect(()=>{
+   if(exercises === undefined) return
+  setFilteredExercises(exercises.filter((exercise)=>exercise.includes(searchedExercise)))
+ },[exercises,searchedExercise]) 
+
 
  
  const goToExerciseDetailsHandler = (exercise:string) => {
@@ -29,6 +38,7 @@ const Exercises:React.FC<Props> = ({navigation}) => {
  //Handles adding Exercise
  const addExerciseHandler = (exercise:string) => {
     if(addExercise) addExercise(exercise);
+    setExerciseToAdd("");
     setShowAddExercise(false)
  }
 
@@ -54,19 +64,18 @@ const Exercises:React.FC<Props> = ({navigation}) => {
 
   return (
     <View style={styles.Container}>
-      <Text style={styles.Title}> Add All your Exercises and track your progress! </Text>
-      <TouchableOpacity
-      style={styles.Button}
-      onPress={()=>clearAppData()} 
-     >
-       <Text>
-          CLEAR APP DATA DEBUG
-       </Text>
-    </TouchableOpacity>
+      <View style={styles.Search}>
+        <Text style={styles.SearchText}> Search: </Text>
+      <TextInput
+        style={styles.SearchInput}
+        onChangeText={text => setSearchedExercise(text)}
+        value={searchedExercise}
+        /> 
+      </View>
       <FlatList
         keyExtractor={(item)=>item.toString()}
         style={styles.List}
-        data={exercises} 
+        data={filteredExercises} 
         renderItem={({item}) => 
         <View style={styles.ExerciseContainer}>
           <TouchableOpacity style={styles.Item} onPress={()=>goToExerciseDetailsHandler(item)}><Text style={styles.ItemText}>{item}</Text></TouchableOpacity>
@@ -106,10 +115,27 @@ const styles = StyleSheet.create({
     backgroundColor: "#1f1f1f",
     height: "100%",
   },
-  Title:{
-    backgroundColor : "#3b3b3b",
+  Search:{
+    paddingLeft:10,
     color:"#fff",
-    fontSize:16
+    fontSize:16,
+    flexDirection:"row",
+    alignItems:"center"
+  },
+  SearchText:{
+    color:"#fff",
+    fontSize:16,
+    textTransform:"uppercase",
+    backgroundColor : "#3b3b3b",
+    marginRight:20,
+    paddingTop:15,
+    paddingBottom:15
+
+  },
+  SearchInput:{
+    backgroundColor : "#3b3b3b",
+    width:"58%",
+    color:"#fff"
   },
   List:{
     marginTop: 24,
@@ -121,10 +147,11 @@ const styles = StyleSheet.create({
     flexDirection:"row",
     marginBottom:16,
     padding:8,
-    alignItems:"center"
+    alignItems:"center",
+    width:"80%"
   },
   Item:{
-    width:"80%",
+    width:"90%"
   },
   Icon:{
     width:15,

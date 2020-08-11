@@ -1,18 +1,30 @@
 import React from 'react';
-import {StyleSheet,Text} from 'react-native';
+import {StyleSheet,Text, TouchableOpacity} from 'react-native';
+import clearAppData from '../helpers/clearAppData';
 
 
 const Profile = () => {
   return (
     <>
-      <Text> Login to Your GymTracker Profile </Text>
-      <Text> Feature not yet implemented </Text>
+     <TouchableOpacity
+      style={styles.Button}
+      onPress={()=>clearAppData()} 
+     >
+       <Text>
+          CLEAR APP DATA DEBUG
+       </Text>
+    </TouchableOpacity>
     </>
   );
 };
 
 const styles = StyleSheet.create({
-
+  Button:{
+    alignItems: 'center',
+    backgroundColor: '#3b3b3b',
+    padding: 10,
+    marginTop:5,
+  },
 });
 
 export default Profile;

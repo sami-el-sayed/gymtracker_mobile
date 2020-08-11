@@ -107,7 +107,6 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
   //Todo Reformat this piece of trash
   return (
     <KeyboardAvoidingView behavior="position" enabled={keyboardEnabled} style={styles.Container}>
-     <Text style={styles.Title}> Add your new workout!</Text>
       {showDatePicker && (
         <DateTimePicker maximumDate={new Date()}  mode="date" value={workoutDate ? workoutDate : new Date()} onChange={(event,date)=>onDateChange(event,date)} />
       )}
@@ -151,7 +150,7 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
          style={styles.ButtonWithMargin}
          onPress={addOrEditWorkout}
          >
-          <Text style={styles.ButtonText}>Add Workout</Text>
+          <Text style={styles.ButtonText}>Save Workout</Text>
         </TouchableOpacity>
        :
         <View/>
@@ -215,6 +214,7 @@ const styles = StyleSheet.create({
   DateContainer:{
     backgroundColor : "#3b3b3b",
     paddingLeft:5,
+    marginTop:15,
     width:"70%",
     flexDirection:"row",
     alignItems:"center"
