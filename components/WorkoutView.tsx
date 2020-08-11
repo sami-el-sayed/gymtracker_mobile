@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
   Icon:{
     width:15,
     height:15,
-    marginLeft:5,
+    marginLeft:15,
     marginRight:15
   },
   DateContainer:{

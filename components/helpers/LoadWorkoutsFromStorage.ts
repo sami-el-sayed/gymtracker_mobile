@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-community/async-storage"
 
 import Workout from "components/models/Workout"
+import sortWorkouts from "./sortWorkouts"
 
 const LoadWorkoutsFromStorage = async (dateKey:string) : Promise<[Workout[],string?]> => {
 
@@ -9,7 +10,8 @@ const LoadWorkoutsFromStorage = async (dateKey:string) : Promise<[Workout[],stri
         const workoutsString:string | null = await AsyncStorage.getItem(dateKey)
         if(workoutsString !== null ){
             const workoutsOBJ = await JSON.parse(workoutsString)
-            return [workoutsOBJ.workouts]
+            const sortedWorkouts = sortWorkouts(workoutsOBJ.workouts)
+            return [sortedWorkouts]
         }
         else return [[]]
     

@@ -1,7 +1,9 @@
 import React,{useState, useContext} from 'react';
 import {GlobalContext} from "../context/GlobalContext"
-import {StyleSheet,Text, FlatList, Button, TextInput, View, TouchableOpacity} from 'react-native';
+import {StyleSheet,Text, FlatList, TextInput, View, TouchableOpacity, Image, Alert} from 'react-native';
 import clearAppData from '../helpers/clearAppData';
+
+import DeleteIcon from "../icons/delete_icon.png"
 
 interface Props{
   navigation:any
@@ -10,11 +12,18 @@ interface Props{
 
 const Exercises:React.FC<Props> = ({navigation}) => {
 
- const {exercises,addExercise} = useContext(GlobalContext)
+ const {exercises,addExercise,deleteExecise} = useContext(GlobalContext)
 
  const [showAddExercise,setShowAddExercise] = useState<boolean>(false)
 
  const [exerciseToAdd,setExerciseToAdd] = useState<string>("");
+
+ 
+ const goToExerciseDetailsHandler = (exercise:string) => {
+  navigation.navigate("ExerciseDetail",{exercise:exercise});
+
+ }
+
 
 
  //Handles adding Exercise
@@ -22,6 +31,26 @@ const Exercises:React.FC<Props> = ({navigation}) => {
     if(addExercise) addExercise(exercise);
     setShowAddExercise(false)
  }
+
+ //Handles deleting Exercise
+ //Creates Alert to see if the user is sure about it 
+ const deleteExerciseHandler = (exercise:string) => {
+  if(deleteExecise === undefined) return;
+  
+  Alert.alert(
+    "Are you sure about deleting this Exercise?",
+    "Info about it will remain in your old Workouts you wont be able to add new progress with it!",
+    [
+      { text: "OK", onPress: () => deleteExecise(exercise) },
+      {
+        text: "Cancel",onPress: () => {},style: "cancel"
+      },
+    ],
+    { cancelable: false }
+  );
+  
+ }
+
 
   return (
     <View style={styles.Container}>
@@ -39,7 +68,11 @@ const Exercises:React.FC<Props> = ({navigation}) => {
         style={styles.List}
         data={exercises} 
         renderItem={({item}) => 
-        <TouchableOpacity style={styles.Item} onPress={()=>navigation.push("ExerciseDetail")}><Text style={styles.ItemText}>{item}</Text></TouchableOpacity>}
+        <View style={styles.ExerciseContainer}>
+          <TouchableOpacity style={styles.Item} onPress={()=>goToExerciseDetailsHandler(item)}><Text style={styles.ItemText}>{item}</Text></TouchableOpacity>
+          <TouchableOpacity onPress={()=>deleteExerciseHandler(item)}><Image style={styles.Icon} source={DeleteIcon}/></TouchableOpacity>
+        </View>
+        }
       />
       {showAddExercise === false ? 
       <TouchableOpacity
@@ -83,12 +116,23 @@ const styles = StyleSheet.create({
     height:"80%",
     paddingLeft:10,
   },
+  ExerciseContainer:{
+    backgroundColor:"#3b3b3b",
+    flexDirection:"row",
+    marginBottom:16,
+    padding:8,
+    alignItems:"center"
+  },
   Item:{
     width:"80%",
-    backgroundColor:"#3b3b3b",
-    marginBottom:16,
-    padding:8
   },
+  Icon:{
+    width:15,
+    height:15,
+    marginLeft:5,
+    marginRight:15
+  },
+
   ItemText:{
     fontSize:16,
     color:"#fff"

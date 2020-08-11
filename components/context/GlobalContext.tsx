@@ -1,5 +1,6 @@
 import React,{createContext, useState,useEffect} from "react"
 import Workout from "../models/Workout"
+
 import LoadExercisesFromStorage from "../helpers/LoadExercisesFromStorage"
 import AddExercisesToStorage from "../helpers/AddExerciseToStorage"
 import AddWorkoutToStorage from "../helpers/AddWorkoutToStorage"
@@ -8,6 +9,7 @@ import editWorkoutToStorage from "../helpers/editWorkoutToStorage"
 import getAllQuartersAndYearsSorted from "../helpers/getAllQuartersAndYearsSorted"
 import removeWorkoutFromStorage from "../helpers/removeWorkoutFromStorage"
 import checkIfExerciseExists from "../helpers/checkIfExerciseExists"
+import removeExerciseFromStorage from "../helpers/removeExerciseFromStorage"
 
 
 interface ContextProps{
@@ -16,6 +18,7 @@ interface ContextProps{
     saveEditedWorkout:(workout:Workout,originalWorkoutDate:Date) =>void
     exercises:string[],
     addExercise:(exercise:string)=>void,
+    deleteExecise:(exercise:string) => void,
     deleteWorkout:(workoutToRemove:Workout)=>void
 }
 
@@ -31,6 +34,7 @@ export const GlobalProvider: React.FunctionComponent = (props) => {
     const [exercises,setExercises] = useState<string[]>([])
 
     const [quarters,setQuarters] = useState<string[]>([])
+    const [currentQuarterIdx,setcurrentQuarterIdx] = useState<number> (0)
 
     //Initially loads quarters and exercises
     useEffect(()=>{
@@ -55,12 +59,16 @@ export const GlobalProvider: React.FunctionComponent = (props) => {
 
     async function initialWorkoutsLoad(){
         let workouts:Workout[] = [];
+        let currentQuarterIdx:number = 0;
 
         for (let i:number = 0; i < quarters.length; i++) {
             const result:[Workout[],string?] = await LoadWorkoutsFromStorage(quarters[i]);
             workouts = workouts.concat(result[0]);
-            if(workouts.length > 20 ) break;                
+            currentQuarterIdx = i;
+            if(workouts.length > 40 ) break;                
         }
+
+        setcurrentQuarterIdx(currentQuarterIdx);
 
         setWorkouts(workouts);
     }
@@ -74,7 +82,11 @@ export const GlobalProvider: React.FunctionComponent = (props) => {
 
     
     async function loadWorkouts() {
-        
+        //Checks if atleast 40 workouts have been initially loaded
+        if(workouts.length < 40) return;
+        else{
+
+        }
     }
 
     
@@ -121,7 +133,8 @@ export const GlobalProvider: React.FunctionComponent = (props) => {
     }
 
     async function deleteExecise(exercise:string){
-        
+        const result:[string[],string?] = await removeExerciseFromStorage(exercise,exercises);
+        setExercises(result[0])
     }
 
 
@@ -134,8 +147,8 @@ export const GlobalProvider: React.FunctionComponent = (props) => {
             addWorkout,
             exercises,
             addExercise,
+            deleteExecise,
             deleteWorkout
-
         }}
         >
         {props.children}

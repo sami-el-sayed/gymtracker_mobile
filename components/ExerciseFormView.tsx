@@ -56,6 +56,8 @@ const ExerciseFormView:React.FC<Props> = ({exerciseNames, exercise,setShowExerci
  //So it doesnt add the Exercise, it edits it 
  const saveHandler = () => {
 
+    console.log(exerciseForm)
+
     if(exerciseForm.name === "") return;
     if(exerciseForm.sets === "") return;
     if(exerciseForm.reps === "") return;
@@ -91,7 +93,7 @@ const ExerciseFormView:React.FC<Props> = ({exerciseNames, exercise,setShowExerci
          >
            {exerciseNames && (exerciseNames.map((exerciseName)=>{
                  return(
-                       <Picker.Item key={exerciseName} label={exerciseName} value={exerciseName} />
+                       <Picker.Item key={exerciseName} label={exerciseName} value={exerciseName.toString()} />
                  )
            }))}          
         </Picker>

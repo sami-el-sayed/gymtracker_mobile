@@ -1,11 +1,10 @@
 import React, { useContext,useState } from 'react';
-import {StyleSheet,Text, FlatList, View, TouchableOpacity} from 'react-native';
+import {StyleSheet,Text, FlatList, View, TouchableOpacity, Alert} from 'react-native';
 
 import {GlobalContext} from "../context/GlobalContext"
 
 import WorkoutView from "../WorkoutView";
 import Workout from '../models/Workout';
-import parseDate from '../helpers/parseDate';
 
 
 interface Props 
@@ -26,14 +25,32 @@ const Workouts:React.FC<Props> = ({navigation}) => {
   }
 
   const deleteWorkoutHandler = (workout:Workout) => {
-    if(deleteWorkout) deleteWorkout(workout)
+
+    if(deleteWorkout === undefined) return;
+      
+    Alert.alert(
+    "Are you sure about deleting this Workout?",
+    "The Progress you put in it will be gone!",
+    [
+      { text: "OK", onPress: () => deleteWorkout(workout) },
+      {
+        text: "Cancel",onPress: () => {}, style: "cancel"
+      },
+    ],
+    { cancelable: false }
+    );
+
+
   }
 
   return (
     <View style={styles.Container}>
       <Text style={styles.Title}> Here are all your Workouts !</Text>
-      <FlatList style={styles.List} inverted data={workouts} 
+      <FlatList 
+      style={styles.List}
+      inverted data={workouts} 
       keyExtractor={(item)=> item.workoutDate}
+      onEndReached={()=>console.log("End Reached")}
       renderItem={({item}) =>
       <WorkoutView 
       deleteWorkout={deleteWorkoutHandler}
