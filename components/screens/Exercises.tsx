@@ -1,7 +1,8 @@
-import React,{useState, useContext,useEffect} from 'react';
-import {GlobalContext} from "../context/GlobalContext"
+import React,{useState, useContext,useEffect,useRef} from 'react';
+import {GlobalContext} from "../context/GlobalContext";
+import DropdownAlert from 'react-native-dropdownalert';
 import {StyleSheet,Text, FlatList, TextInput, View, TouchableOpacity, Image, Alert} from 'react-native';
-import clearAppData from '../helpers/clearAppData';
+
 
 import DeleteIcon from "../icons/delete_icon.png"
 
@@ -14,6 +15,9 @@ const Exercises:React.FC<Props> = ({navigation}) => {
 
  const {exercises,addExercise,deleteExecise} = useContext(GlobalContext)
  const [filteredExercises,setFilteredExercises] = useState<string[]>([]);
+ 
+ const dropDownAlertRef = useRef<DropdownAlert | null>(null);
+
 
  const [showAddExercise,setShowAddExercise] = useState<boolean>(false)
 
@@ -30,16 +34,21 @@ const Exercises:React.FC<Props> = ({navigation}) => {
  
  const goToExerciseDetailsHandler = (exercise:string) => {
   navigation.navigate("ExerciseDetail",{exercise:exercise});
-
  }
 
 
 
  //Handles adding Exercise
- const addExerciseHandler = (exercise:string) => {
-    if(addExercise) addExercise(exercise);
-    setExerciseToAdd("");
-    setShowAddExercise(false)
+ const addExerciseHandler = async (exercise:string) => {
+    if(!addExercise) return 
+    const exerciseAdded = await addExercise(exercise);
+    if(exerciseAdded[0] === false){
+      dropDownAlertRef.current?.alertWithType("error","Error","Exercise Already exists!");
+    }
+    else{
+      setExerciseToAdd("");
+      setShowAddExercise(false)  
+    }
  }
 
  //Handles deleting Exercise
@@ -106,6 +115,7 @@ const Exercises:React.FC<Props> = ({navigation}) => {
 
       </View>
       }
+      <DropdownAlert ref={dropDownAlertRef} />
     </View>
   );
 };

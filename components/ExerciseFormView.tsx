@@ -3,6 +3,7 @@ import { Text, StyleSheet, TextInput, TouchableOpacity, View } from 'react-nativ
 import {Picker} from "@react-native-community/picker"
 import Point from './models/Point';
 import Exercise from './models/Exercise';
+import DropdownAlert from 'react-native-dropdownalert';
 
 interface Props{
     exercise?:Exercise,
@@ -10,12 +11,13 @@ interface Props{
     editExercise:(exercise:Exercise)=>void,
     addExerciseToWorkout:(exercise:Exercise) => void,
     setShowExerciseForm:Function,
-    setKeyboardEnabled:Function
+    setKeyboardEnabled:Function,
+    dropDownAlert:DropdownAlert | null
 }
 
 //View for adding Exercises to Workout
 //Exercise Can be Passed for editing it 
-const ExerciseFormView:React.FC<Props> = ({exerciseNames, exercise,setShowExerciseForm,addExerciseToWorkout,editExercise,setKeyboardEnabled}) => {
+const ExerciseFormView:React.FC<Props> = ({exerciseNames, exercise,setShowExerciseForm,addExerciseToWorkout,editExercise,setKeyboardEnabled,dropDownAlert}) => {
     
  //If Exercise is passed loads exercise parameters into form
  const [exerciseForm,setExerciseForm] = useState({
@@ -57,12 +59,20 @@ const ExerciseFormView:React.FC<Props> = ({exerciseNames, exercise,setShowExerci
  const saveHandler = () => {
 
     console.log(exerciseForm)
-
-    if(exerciseForm.name === "") return;
-    if(exerciseForm.sets === "") return;
-    if(exerciseForm.reps === "") return;
-    if(exerciseForm.weight === "") return;
-    if(exerciseForm.status === "") return;
+    if(
+        exerciseForm.name === "" || 
+        exerciseForm.sets === "" ||
+        exerciseForm.reps === "" ||
+        exerciseForm.weight === "" ||
+        exerciseForm.status === "" 
+    )
+    {   
+        if(dropDownAlert !== null){
+            dropDownAlert.alertWithType("error","Error!","Fill out every field!")
+        }
+        return;
+    }
+ 
 
     const point:Point = new Point(
         new Date(),

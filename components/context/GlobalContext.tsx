@@ -15,12 +15,12 @@ import removeExerciseFromStorage from "../helpers/removeExerciseFromStorage"
 interface ContextProps{
     workouts:Workout[],
     loadWorkouts:()=>void,
-    addWorkout:(workoutToAdd:Workout)=>void,
-    saveEditedWorkout:(workout:Workout,originalWorkoutDate:Date) =>void,
+    addWorkout:(workoutToAdd:Workout)=>Promise<[boolean,string?]>,
+    saveEditedWorkout:(workout:Workout,originalWorkoutDate:Date) =>Promise<[boolean,string?]>,
     quarters:string[],
     currentQuarterIdx:number,
     exercises:string[],
-    addExercise:(exercise:string)=>void,
+    addExercise:(exercise:string)=>Promise<[boolean,string?]>,
     deleteExecise:(exercise:string) => void,
     deleteWorkout:(workoutToRemove:Workout)=>void
 }
@@ -57,15 +57,15 @@ export const GlobalProvider: React.FunctionComponent = (props) => {
         }
     },[quarters])
 
-    //Initial load of Workouts
-    //If there is more than 20 workouts it breaks the loop
-
+    //Initial load of Workouts when component Renders
     async function initialWorkoutsLoad(){
         const workoutsTemp = workouts.slice();
         const loadedWorkouts = await LoadWorkoutsLoop(0);
         setWorkouts(workoutsTemp.concat(loadedWorkouts));
     }
 
+    //Loop that breaks every 40 loadedWorkouts
+    //Saves on what index it finished
     async function LoadWorkoutsLoop(startInt:number): Promise<Workout[]>{
         let workouts:Workout[] = [];
 
@@ -81,14 +81,17 @@ export const GlobalProvider: React.FunctionComponent = (props) => {
 
     }
 
-    async function addWorkout(workoutToAdd:Workout) {
+    //Adds Workout to Storage
+    //Updates Workouts State
+    async function addWorkout(workoutToAdd:Workout):Promise<[boolean,string?]> {
         const result:[boolean,string?] = await AddWorkoutToStorage(workoutToAdd,false);
         const added:boolean = result[0];
-        if(added === true) setWorkouts([...workouts,workoutToAdd])    
-    
+        if(added === true) setWorkouts([...workouts,workoutToAdd])
+        return result;
     }
 
-    
+    //Loads Workouts from Storage
+    //Func called from other Views such as lists when top is reached
     async function loadWorkouts() {
         //Checks if atleast 40 workouts have been initially loaded
         if(workouts.length < 40) return;
@@ -100,7 +103,7 @@ export const GlobalProvider: React.FunctionComponent = (props) => {
     }
 
     
-
+    //Loads Exercises from Storage
     async function loadExercises(){
         const result:[string[],string?] = await LoadExercisesFromStorage();
         const exercises = result[0];
@@ -114,10 +117,15 @@ export const GlobalProvider: React.FunctionComponent = (props) => {
     }
 
     
-
-    const saveEditedWorkout = async (workout:Workout,originalWorkoutDate:Date) => {
+    //Saves Edited Workout
+    const saveEditedWorkout = async (workout:Workout,originalWorkoutDate:Date):Promise<[boolean,string?]>  => {
         
         const result = await editWorkoutToStorage(workout,originalWorkoutDate);
+        if(result[0] === true){
+            await LoadWorkoutsLoop(0);
+            return result;
+        }
+        else return result;
 
     }
 
@@ -129,20 +137,25 @@ export const GlobalProvider: React.FunctionComponent = (props) => {
 
     }
 
-    async function addExercise(exercise:string){
+    //Adds Exercise To Storage
+    async function addExercise(exercise:string): Promise<[boolean,string?]>{
         const duplicateExists:boolean = checkIfExerciseExists(exercises,exercise)
+
+        if(duplicateExists === true) return [false,"This exercise already exists!"]
 
         if(duplicateExists === false){
 
             const newExercises:string[] = [...exercises,exercise]
             const result:[boolean,string?] = await AddExercisesToStorage(newExercises);
             const added:boolean = result[0]
-            if(added === true) setExercises(newExercises)    
-
+            if(added === true) setExercises(newExercises)
+            return [true]
         }
-        
+        return [false]
     }
 
+
+    //Deletes Exercise from Storage
     async function deleteExecise(exercise:string){
         const result:[string[],string?] = await removeExerciseFromStorage(exercise,exercises);
         setExercises(result[0])

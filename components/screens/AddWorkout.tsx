@@ -1,5 +1,6 @@
-import React, { useState, useContext,useEffect } from 'react';
+import React, { useState, useContext,useEffect,useRef } from 'react';
 import { Text, StyleSheet,FlatList, View, TouchableOpacity, KeyboardAvoidingView, Image } from 'react-native';
+import DropdownAlert from 'react-native-dropdownalert';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 import {GlobalContext} from "../context/GlobalContext"
@@ -29,6 +30,7 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
   const [workoutDate,setWorkoutDate] = useState<Date>( editedWorkout ? new Date(editedWorkout.workoutDate) :  new Date())
   const [dateSet,setDateSet] = useState<boolean>(editedWorkout ? true: false)
   const [showDatePicker,setShowDatePicker] = useState<boolean>(false)
+  const DropdownAlertRef = useRef<DropdownAlert | null>(null);
 
   const [localExercises,setLocalExercises] = useState<Exercise[]>(editedWorkout ? editedWorkout.exercises : [])
   const [showExerciseForm,setShowExerciseForm] = useState<boolean>(false)
@@ -59,17 +61,26 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
 
   //If editedWorkout is present means we want to EditWorkout
   //Else if editedWorkout is not present means we want to Add a Workout
-  const addOrEditWorkout = () => {
+  const addOrEditWorkout = async () => {
 
     const newWorkout:Workout = new Workout(workoutDate,localExercises);
 
     //If Edited workout means we editing so we save the edit
-    if(editedWorkout 
-      && saveEditedWorkout 
-      && originalWorkoutDate ) saveEditedWorkout(newWorkout,originalWorkoutDate)
+    if(editedWorkout && saveEditedWorkout && originalWorkoutDate ) {
+      const saved:[boolean,string?] =  await saveEditedWorkout(newWorkout,originalWorkoutDate);
+      if(saved[0] !== true){
+        DropdownAlertRef.current?.alertWithType("error","Error!",saved[1] ? saved[1] : "An Error Occured");
+      }
+      else navigation.push("Workouts") 
+    } 
     //ese we are adding a new Workout
-    else if(addWorkout) addWorkout(newWorkout)
-    navigation.push("Workouts") 
+    else if(addWorkout) {
+      const saved: [boolean,string?] = await addWorkout(newWorkout)
+      if(saved[0] !== true){
+        DropdownAlertRef.current?.alertWithType("error","Error!",saved[1] ? saved[1] : "An Error Occured");
+      }
+      else navigation.push("Workouts") 
+    }
   }
 
   
@@ -165,11 +176,13 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
      addExerciseToWorkout={addExerciseToWorkout} 
      setKeyboardEnabled={setKeyboardEnabled} 
      setShowExerciseForm={setShowExerciseForm}
+     dropDownAlert={DropdownAlertRef.current}
      />
     }
     </View>
     }
-   
+
+    <DropdownAlert ref={DropdownAlertRef} />
     </KeyboardAvoidingView>
   );
 };
