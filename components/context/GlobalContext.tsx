@@ -122,7 +122,8 @@ export const GlobalProvider: React.FunctionComponent = (props) => {
         
         const result = await editWorkoutToStorage(workout,originalWorkoutDate);
         if(result[0] === true){
-            await LoadWorkoutsLoop(0);
+            setWorkouts(await LoadWorkoutsLoop(0));
+            loadQuarters();
             return result;
         }
         else return result;

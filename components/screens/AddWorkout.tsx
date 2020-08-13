@@ -144,16 +144,19 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
        keyExtractor={(item)=>item.name}
        renderItem={({item})=>
        <View style={styles.ExerciseContainer}>
-         <Text style={styles.Exercise}>{item.name}</Text>
+         <Text style={styles.ExerciseText}>{item.name}</Text>
+         <Text style={styles.ExerciseText}>{item.points[0].sets} x {item.points[0].reps}</Text>
+         <Text style={styles.ExerciseText}>{item.points[0].weight}kg</Text>
+         <Text style={styles.ExerciseText}>{item.points[0].status}</Text>
          <TouchableOpacity onPress={()=>exerciseToEditHandler(item)}>
           <Image style={styles.Icon} source={EditIcon} />
-        </TouchableOpacity>
+         </TouchableOpacity>
         </View>} 
        />
        <TouchableOpacity
          style={styles.ButtonWithMargin}
          onPress={addExerciseHandler}
-      >
+       >
           <Text style={styles.ButtonText}>Add Exercise</Text>
       </TouchableOpacity>
        {localExercises.length > 0 ? 
@@ -222,30 +225,31 @@ const styles = StyleSheet.create({
   Icon:{
     width:15,
     height:15,
-    marginLeft:10,
+    marginLeft:20,
   },
   DateContainer:{
     backgroundColor : "#3b3b3b",
     paddingLeft:5,
     marginTop:15,
-    width:"70%",
+    width:"80%",
     flexDirection:"row",
-    alignItems:"center"
+    alignItems:"center",
   },
   ExerciseContainer:{
-    marginLeft:5,
     marginTop:15,
     flexDirection:"row",
     backgroundColor : "#3b3b3b",
     alignSelf: 'flex-start',
     alignItems:"center",
-    paddingLeft:5,
+    justifyContent:"space-evenly",
+    paddingLeft:2,
     paddingRight:15,
   },
-  Exercise:{
-    fontSize:20,
+  ExerciseText:{
+    fontSize:16,
     color:"#fff",
-  }
+    marginRight:10
+  },
 });
 
 export default AddWorkout;
