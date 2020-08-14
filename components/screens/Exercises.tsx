@@ -1,5 +1,5 @@
 import React,{useState, useContext,useEffect,useRef} from 'react';
-import {GlobalContext} from "../context/GlobalContext";
+import {ExerciseContext} from "../context/ExerciseContext";
 import DropdownAlert from 'react-native-dropdownalert';
 import {StyleSheet,Text, FlatList, TextInput, View, TouchableOpacity, Image, Alert} from 'react-native';
 
@@ -13,7 +13,7 @@ interface Props{
 
 const Exercises:React.FC<Props> = ({navigation}) => {
 
- const {exercises,addExercise,deleteExecise} = useContext(GlobalContext)
+ const {exercises,addExercise,deleteExecise} = useContext(ExerciseContext)
  const [filteredExercises,setFilteredExercises] = useState<string[]>([]);
  
  const dropDownAlertRef = useRef<DropdownAlert | null>(null);

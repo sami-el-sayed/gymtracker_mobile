@@ -3,7 +3,10 @@ import {NavigationContainer} from "@react-navigation/native"
 import {createBottomTabNavigator} from "@react-navigation/bottom-tabs"
 import {StyleSheet} from 'react-native';
 
-import {GlobalProvider} from "./components/context/GlobalContext"
+import { ExerciseProvider } from "./components/context/ExerciseContext";
+import { WorkoutProvider } from './components/context/WorkoutContext';
+
+
 
 import ExercisesStackScreen from './components/stacks/ExercisesStackScreen';
 import WorkoutsStackScreen from './components/stacks/WorkoutsStackScreen';
@@ -18,8 +21,9 @@ const Tabs = createBottomTabNavigator();
 
 const App = () => {
   return (
-    <GlobalProvider>
-      <NavigationContainer>
+      <WorkoutProvider>
+      <ExerciseProvider>
+        <NavigationContainer>
         <Tabs.Navigator
         tabBarOptions={{
           activeBackgroundColor:"#171717",
@@ -36,7 +40,8 @@ const App = () => {
           <Tabs.Screen name="Profile" component={Profile} />
         </Tabs.Navigator>
       </NavigationContainer>
-    </GlobalProvider>
+      </ExerciseProvider>
+      </WorkoutProvider>
   );
 };
 

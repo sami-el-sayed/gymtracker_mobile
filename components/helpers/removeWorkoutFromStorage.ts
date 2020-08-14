@@ -56,7 +56,6 @@ const removeWorkoutFromStorage = async (DateToRemove:Date,workoutToKeep?:Workout
     
     } 
     catch(e) {
-        console.log(e)
         return [false,`An Error occured loading Workouts: ${e}`]
     }
 }

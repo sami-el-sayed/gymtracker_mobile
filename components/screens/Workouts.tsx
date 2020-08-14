@@ -2,7 +2,7 @@ import React, { useContext,useState,useEffect } from 'react';
 import {StyleSheet,Text, FlatList, View, TouchableOpacity, Alert} from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-import {GlobalContext} from "../context/GlobalContext"
+import {WorkoutContext} from "../context/WorkoutContext"
 
 import WorkoutView from "../WorkoutView";
 import Workout from '../models/Workout';
@@ -15,7 +15,7 @@ interface Props
 
 const Workouts:React.FC<Props> = ({navigation}) => {
  
-  const {workouts,deleteWorkout,loadWorkouts} = useContext(GlobalContext)
+  const {workouts,deleteWorkout,loadWorkouts} = useContext(WorkoutContext)
 
   const [filteredWorkouts,setFilteredWorkouts] = useState<Workout[]>([])
 

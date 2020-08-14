@@ -1,10 +1,10 @@
 import React,{useState,useContext, useEffect} from 'react';
 import {StyleSheet,Text, View, FlatList} from 'react-native';
-import {GlobalContext} from "../context/GlobalContext"
+import {WorkoutContext} from '../context/WorkoutContext';
 import loadProgress from '../helpers/loadExerciseProgress';
 import Point from '../models/Point';
 import LoadWorkoutsFromStorage from '../helpers/LoadWorkoutsFromStorage';
-import Workout from 'components/models/Workout';
+import Workout from '../models/Workout';
 
 interface Props 
 {
@@ -15,7 +15,7 @@ const ExerciseDetail:React.FC<Props> = ({route}) => {
 
   const {exercise} = route.params
 
-  const {workouts,currentQuarterIdx,quarters} = useContext(GlobalContext)
+  const {workouts,currentQuarterIdx,quarters} = useContext(WorkoutContext)
 
   const [ExerciseProgress,setExerciseProgress] = useState<Point[]>([])
 

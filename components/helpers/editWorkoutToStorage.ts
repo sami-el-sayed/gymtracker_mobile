@@ -24,7 +24,6 @@ const editWorkoutToStorage = async (workout:Workout,originalDate:Date) : Promise
     
     }
     catch(e){
-        console.log(e)
         return [false,`An error occured: ${e}`]
     }
     

@@ -11,7 +11,6 @@ const AddWorkoutToStorage = async (workout:Workout,edited:boolean) : Promise<[bo
 
     const keyFinal:string = `${dateKey}-workouts`
 
-    console.log("KEY FINAL" + keyFinal)
     
     try {
 
@@ -40,9 +39,6 @@ const AddWorkoutToStorage = async (workout:Workout,edited:boolean) : Promise<[bo
             }
 
             workouts.push(workout)
-
-            console.log("workouts")
-            console.log(workouts)
 
             const workoutsObj = {
                 workouts:workouts

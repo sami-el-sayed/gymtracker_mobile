@@ -1,15 +1,18 @@
-import React, { useState, useContext,useEffect,useRef } from 'react';
+import React, { useState, useContext,useEffect,useRef, useCallback } from 'react';
 import { Text, StyleSheet,FlatList, View, TouchableOpacity, KeyboardAvoidingView, Image } from 'react-native';
 import DropdownAlert from 'react-native-dropdownalert';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-import {GlobalContext} from "../context/GlobalContext"
+import {ExerciseContext} from "../context/ExerciseContext"
+import {WorkoutContext} from "../context/WorkoutContext"
+
 
 import EditIcon from "../icons/edit_icon.png"
 
 import Exercise from '../models/Exercise';
 import ExerciseFormView from '../ExerciseFormView';
 import Workout from '../models/Workout';
+import { useFocusEffect } from '@react-navigation/native';
 
 interface Props 
 {
@@ -25,7 +28,8 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
   if(editedWorkout !==undefined) originalWorkoutDate = editedWorkout.workoutDate;
 
 
-  const {addWorkout,saveEditedWorkout,exercises} = useContext(GlobalContext)
+  const {addWorkout,saveEditedWorkout} = useContext(WorkoutContext)
+  const {exercises} = useContext(ExerciseContext)
   
   const [workoutDate,setWorkoutDate] = useState<Date>( editedWorkout ? new Date(editedWorkout.workoutDate) :  new Date())
   const [dateSet,setDateSet] = useState<boolean>(editedWorkout ? true: false)
@@ -48,6 +52,26 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
       setLocalExercises(exercisesCopy);
     }
   },[editedWorkout])
+
+  useFocusEffect(
+    useCallback(() => {
+      // Do something when the screen is focused
+
+      return () => {
+        resetState();
+      };
+    }, [])
+  );
+
+  const resetState = () => {
+    setWorkoutDate(new Date());
+    setDateSet(false);
+    setShowDatePicker(false);
+    setLocalExercises([]);
+    setShowExerciseForm(false);
+    setExerciseToEdit(undefined)
+  }
+
 
   //For KeyboardAvoidingView
   const [keyboardEnabled,setKeyboardEnabled] = useState<boolean>(false)
