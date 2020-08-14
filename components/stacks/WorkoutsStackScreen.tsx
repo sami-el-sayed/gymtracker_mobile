@@ -13,6 +13,7 @@ const WorkoutsStackScreen = () => {
     <WorkoutsStack.Navigator>
         <WorkoutsStack.Screen name="Workouts" component = {Workouts}
           options={{
+            headerLeft:()=>null,
             title: 'Workouts',
             headerStyle: {
               backgroundColor: '#292929',

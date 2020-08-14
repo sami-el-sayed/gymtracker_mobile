@@ -6,6 +6,7 @@ import {WorkoutContext} from "../context/WorkoutContext"
 
 import WorkoutView from "../WorkoutView";
 import Workout from '../models/Workout';
+import parseDate from '../helpers/parseDate';
 
 
 interface Props 
@@ -38,25 +39,27 @@ const Workouts:React.FC<Props> = ({navigation}) => {
     if(workouts === undefined) return
     if(searchDate === undefined) return
 
+    const parsedDateElapsedTime = new Date(parseDate(searchDate)).getTime();
+
     switch (option) {
       case "before":
 
         setFilteredWorkouts(workouts.filter((workout)=>{
-          return new Date(workout.workoutDate).getTime() < searchDate.getTime();
+          return new Date(workout.workoutDate).getTime() < parsedDateElapsedTime;
         }));
 
         break;
       case "equals":
 
         setFilteredWorkouts(workouts.filter((workout)=>{
-          return new Date(workout.workoutDate).getTime() === searchDate.getTime();
+          return new Date(workout.workoutDate).getTime() === parsedDateElapsedTime;
         }));
 
         break;
       case "after":
         
         setFilteredWorkouts(workouts.filter((workout)=>{
-          return new Date(workout.workoutDate).getTime() > searchDate.getTime();
+          return new Date(workout.workoutDate).getTime() > parsedDateElapsedTime;
         }));
         break;
         

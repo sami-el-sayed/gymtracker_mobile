@@ -31,12 +31,14 @@ const WorkoutView:React.FC<Props> = ({workout,goToEditWorkout,deleteWorkout}) =>
     <View style={styles.Container}>
       <View style={styles.DateContainer}>
         <Text style={styles.Date}>{workout.workoutDate}</Text>
-        <TouchableOpacity onPress={goToEditWorkoutHandler}>
-          <Image style={styles.Icon} source={EditIcon} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={deleteWorkoutHandler}>
-          <Image style={styles.Icon} source={DeleteIcon} />
-        </TouchableOpacity>
+        <View style={styles.IconContainer}>
+          <TouchableOpacity onPress={goToEditWorkoutHandler}>
+            <Image style={styles.Icon} source={EditIcon} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={deleteWorkoutHandler}>
+            <Image style={styles.Icon} source={DeleteIcon} />
+          </TouchableOpacity>
+        </View>
       </View>
       {workout.exercises.map((exercise)=>{
        return <View key={exercise.name} style={styles.Exercise}>
@@ -61,25 +63,29 @@ const styles = StyleSheet.create({
     color:"#fff",
     fontSize:32,
   },
-  Icon:{
-    width:15,
-    height:15,
-    marginLeft:15,
-    marginRight:15
-  },
   DateContainer:{
+    width:"95%",
     backgroundColor : "#3b3b3b",
-    width:"80%",
     flexDirection:"row",
-    alignItems:"center"
+    alignItems:"center",
+    justifyContent:"space-between"
+  },
+  IconContainer:{
+    flexDirection:"row"
+  },
+  Icon:{
+    width:20,
+    height:20,
+    marginRight:30
   },
   Exercise:{
     backgroundColor : "#3b3b3b",
-    paddingLeft:8,
+    paddingLeft:5,
+    paddingRight:10,
     marginTop:15,
     marginBottom:5,
     paddingBottom:2,
-    width:"60%"
+    maxWidth:"75%"
   },
   ExerciseName:{
     fontSize:20,

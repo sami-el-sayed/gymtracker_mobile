@@ -6,13 +6,15 @@ import LoadWorkoutsFromStorage from "../helpers/LoadWorkoutsFromStorage"
 import editWorkoutToStorage from "../helpers/editWorkoutToStorage"
 import getAllQuartersAndYearsSorted from "../helpers/getAllQuartersAndYearsSorted"
 import removeWorkoutFromStorage from "../helpers/removeWorkoutFromStorage"
+import sortWorkouts from "../helpers/sortWorkouts"
+import matchWorkouts from "components/helpers/matchWorkouts"
 
 
 interface ContextProps{
     workouts:Workout[],
     loadWorkouts:()=>void,
     addWorkout:(workoutToAdd:Workout)=>Promise<[boolean,string?]>,
-    saveEditedWorkout:(workout:Workout,originalWorkoutDate:Date) =>Promise<[boolean,string?]>,
+    saveEditedWorkout:(workout:Workout,originalWorkout:Workout,originalWorkoutDate:Date) =>Promise<[boolean,string?]>,
     quarters:string[],
     currentQuarterIdx:number,
     deleteWorkout:(workoutToRemove:Workout)=>void
@@ -79,7 +81,7 @@ export const WorkoutProvider: React.FunctionComponent = (props) => {
         const result:[boolean,string?] = await AddWorkoutToStorage(workoutToAdd,false);
         const added:boolean = result[0];
         if(added === true) {
-            setWorkouts([...workouts,workoutToAdd]);
+            setWorkouts(sortWorkouts([...workouts,workoutToAdd]));
             loadQuarters();
         }
         return result;
@@ -101,9 +103,10 @@ export const WorkoutProvider: React.FunctionComponent = (props) => {
 
     
     //Saves Edited Workout
-    const saveEditedWorkout = async (workout:Workout,originalWorkoutDate:Date):Promise<[boolean,string?]>  => {
+    const saveEditedWorkout = async (workout:Workout,originalWorkout:Workout,originalWorkoutDate:Date):Promise<[boolean,string?]>  => {
         
-        const result = await editWorkoutToStorage(workout,originalWorkoutDate);
+        const result = await editWorkoutToStorage(workout,originalWorkout,originalWorkoutDate);
+
         if(result[0] === true){
             setWorkouts(await LoadWorkoutsLoop(0));
             loadQuarters();

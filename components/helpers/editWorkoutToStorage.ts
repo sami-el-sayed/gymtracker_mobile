@@ -2,11 +2,14 @@ import Workout from "../models/Workout"
 import removeWorkoutFromStorage from "./removeWorkoutFromStorage"
 import AddWorkoutToStorage from "./AddWorkoutToStorage";
 import parseDate from "./parseDate";
+import matchWorkouts from "./matchWorkouts";
 
-const editWorkoutToStorage = async (workout:Workout,originalDate:Date) : Promise<[boolean,string?]> => {
+const editWorkoutToStorage = async (workout:Workout,originalWorkout:Workout,originalDate:Date) : Promise<[boolean,string?]> => {
 
     try{
 
+        if(matchWorkouts(workout,originalWorkout)) return [false,`Workouts are the same!`];
+        
         const dateChanged:boolean = workout.workoutDate !== parseDate(originalDate);
         const workoutAdded = await AddWorkoutToStorage(workout,dateChanged ? false : true);
 

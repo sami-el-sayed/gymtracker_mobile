@@ -12,7 +12,6 @@ const matchWorkouts = (workoutA:Workout,workoutB:Workout) => {
         if(workoutA.exercises[i].points[j].sets !== workoutB.exercises[i].points[j].sets) return false;
         if(workoutA.exercises[i].points[j].weight !== workoutB.exercises[i].points[j].weight) return false;
       }
-
     }
 
     return true;

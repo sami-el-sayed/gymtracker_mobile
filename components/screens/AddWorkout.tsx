@@ -6,8 +6,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import {ExerciseContext} from "../context/ExerciseContext"
 import {WorkoutContext} from "../context/WorkoutContext"
 
-
 import EditIcon from "../icons/edit_icon.png"
+import DeleteIcon from "../icons/delete_icon.png"
 
 import Exercise from '../models/Exercise';
 import ExerciseFormView from '../ExerciseFormView';
@@ -91,7 +91,7 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
 
     //If Edited workout means we editing so we save the edit
     if(editedWorkout && saveEditedWorkout && originalWorkoutDate ) {
-      const saved:[boolean,string?] =  await saveEditedWorkout(newWorkout,originalWorkoutDate);
+      const saved:[boolean,string?] =  await saveEditedWorkout(newWorkout,editedWorkout,originalWorkoutDate);
       if(saved[0] !== true){
         DropdownAlertRef.current?.alertWithType("error","Error!",saved[1] ? saved[1] : "An Error Occured");
       }
@@ -114,6 +114,7 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
   }
 
   //Adds Exercise to Workout Exercises Array
+  //Adds ID for easier editing
   const addExerciseToWorkout = (exercise:Exercise) => {
     exercise.id = localExercises.length;
     setLocalExercises([...localExercises,exercise])
@@ -131,12 +132,16 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
     setLocalExercises(exercisesCopy);
   } 
 
-  //Sets Exercise to Edit
+  //Sets Exercise to Edit into state
   const exerciseToEditHandler = (exercise:Exercise) => {
     setExerciseToEdit(exercise)
     setShowExerciseForm(true)
   }
 
+  //Deletes local exercise from added/edited workout
+  const deleteExercise = (exerciseToDelete:Exercise) => {
+    setLocalExercises(localExercises.filter(exercise=>exercise.id !== exerciseToDelete.id))
+  }
 
 
   //Todo Reformat this piece of trash
@@ -174,6 +179,9 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
          <Text style={styles.ExerciseText}>{item.points[0].status}</Text>
          <TouchableOpacity onPress={()=>exerciseToEditHandler(item)}>
           <Image style={styles.Icon} source={EditIcon} />
+         </TouchableOpacity>
+         <TouchableOpacity onPress={()=>deleteExercise(item)}>
+          <Image style={styles.Icon} source={DeleteIcon} />
          </TouchableOpacity>
         </View>} 
        />
@@ -229,7 +237,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#3b3b3b',
     padding: 10,
-
   },
   ButtonWithMargin:{
     alignItems: 'center',
