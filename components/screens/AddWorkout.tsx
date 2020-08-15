@@ -14,6 +14,7 @@ import ExerciseFormView from '../ExerciseFormView';
 import Workout from '../models/Workout';
 import { useFocusEffect } from '@react-navigation/native';
 import addWorkoutValidation from '../helpers/form_validation/addWorkoutValidation';
+import matchExercises from 'components/helpers/exercises/matchExercises';
 
 interface Props 
 {
@@ -123,19 +124,54 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
 
   //Adds Exercise to Workout Exercises Array
   //Adds ID for easier editing
-  const addExerciseToWorkout = (exercise:Exercise) => {
-    exercise.id = localExercises.length;
-    setLocalExercises([...localExercises,exercise])
+  const addExerciseToWorkout = (exerciseToAdd:Exercise) => {
+
+    //Checks for duplicat exercises with every local exercise in the array
+    //If it finds one it returns 
+    let foundDuplicate:boolean = false;
+    for (let i = 0; i < localExercises.length; i++) {
+
+      if(matchExercises(exerciseToAdd,localExercises[i]) === true ){
+        foundDuplicate = true;
+        break;
+      }
+      
+    }
+    if(foundDuplicate === true){
+      DropdownAlertRef.current?.alertWithType("error","Error!", "Found Duplicate Exercise");
+      return
+    }
+
+    exerciseToAdd.id = localExercises.length;
+    setLocalExercises([...localExercises,exerciseToAdd])
   }
 
 
   //Edits exercise based on ID
-  const editExercise = (exercise:Exercise) => {
+  const editExercise = (exerciseToEdit:Exercise) => {
     if(exerciseToEdit === undefined) return
     if(exerciseToEdit.id === undefined) return
 
+    //Checks for duplicat exercises with every local exercise in the array
+    //If it finds one it returns 
+    let foundDuplicate:boolean = false;
+    for (let i = 0; i < localExercises.length; i++) {
+
+      if(matchExercises(exerciseToEdit,localExercises[i]) === true ){
+        foundDuplicate = true;
+        break;
+      }
+      
+    }
+    if(foundDuplicate === true){
+      DropdownAlertRef.current?.alertWithType("error","Error!", "Found Duplicate Exercise");
+      return;
+    }
+
+
+
     const exercisesCopy:Exercise[] = localExercises.slice();
-    exercisesCopy[exerciseToEdit.id] = exercise;
+    exercisesCopy[exerciseToEdit.id] = exerciseToEdit;
 
     setLocalExercises(exercisesCopy);
   } 
@@ -178,7 +214,7 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
         </TouchableOpacity>
        </View>
        <FlatList data={localExercises} 
-       keyExtractor={(item)=>localExercises.indexOf(item).toString()}
+       keyExtractor={(item)=>(`${item.name+item.points[0].sets.toString()+item.points[0].reps.toString()+item.points[0].weight.toString()}`)}
        renderItem={({item})=>
        <View style={styles.ExerciseContainer}>
          <Text style={styles.ExerciseText}>{item.name}</Text>
