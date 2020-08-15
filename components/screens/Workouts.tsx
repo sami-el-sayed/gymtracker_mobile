@@ -6,7 +6,7 @@ import {WorkoutContext} from "../context/WorkoutContext"
 
 import WorkoutView from "../WorkoutView";
 import Workout from '../models/Workout';
-import parseDate from '../helpers/parseDate';
+import parseDate from '../helpers/date/parseDate';
 
 
 interface Props 

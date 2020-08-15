@@ -1,9 +1,9 @@
 import React,{useState,useContext, useEffect} from 'react';
 import {StyleSheet,Text, View, FlatList} from 'react-native';
 import {WorkoutContext} from '../context/WorkoutContext';
-import loadProgress from '../helpers/loadExerciseProgress';
+import loadProgress from '../helpers/exercises/loadExerciseProgress';
 import Point from '../models/Point';
-import LoadWorkoutsFromStorage from '../helpers/LoadWorkoutsFromStorage';
+import LoadWorkoutsFromStorage from '../helpers/workouts_quarters/LoadWorkoutsFromStorage';
 import Workout from '../models/Workout';
 
 interface Props 

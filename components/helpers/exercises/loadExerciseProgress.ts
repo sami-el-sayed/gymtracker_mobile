@@ -1,5 +1,5 @@
-import Point from "components/models/Point"
-import Workout from "components/models/Workout";
+import Point from "../../models/Point"
+import Workout from "../../models/Workout";
 
 const  loadProgress = (workouts:Workout[],exercise:string):Point[] => {
     const points:Point[] = [];

@@ -5,6 +5,7 @@ import {StyleSheet,Text, FlatList, TextInput, View, TouchableOpacity, Image, Ale
 
 
 import DeleteIcon from "../icons/delete_icon.png"
+import addExerciseValidation from '../helpers/form_validation/addExerciseValidation';
 
 interface Props{
   navigation:any
@@ -41,9 +42,16 @@ const Exercises:React.FC<Props> = ({navigation}) => {
  //Handles adding Exercise
  const addExerciseHandler = async (exercise:string) => {
     if(!addExercise) return 
+
+    const exerciseValidated:[boolean,string?] = addExerciseValidation(exercise);
+    if(exerciseValidated[0] === false){
+      dropDownAlertRef.current?.alertWithType("error","Error",`${exerciseValidated[1]}`);
+      return
+    }
+
     const exerciseAdded = await addExercise(exercise);
     if(exerciseAdded[0] === false){
-      dropDownAlertRef.current?.alertWithType("error","Error","Exercise Already exists!");
+      dropDownAlertRef.current?.alertWithType("error","Error",`${exerciseAdded[1]}`);
     }
     else{
       setExerciseToAdd("");

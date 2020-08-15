@@ -1,8 +1,8 @@
 import AsyncStorage from "@react-native-community/async-storage"
 
-import Workout from "../models/Workout"
-import getMonthYear from "./getMonthYear"
-import parseDate from "./parseDate";
+import Workout from "../../models/Workout"
+import getMonthYear from "../date/getMonthYear"
+import parseDate from "../date/parseDate";
 import matchWorkouts from "./matchWorkouts";
 
 

@@ -1,12 +1,9 @@
-
-
-
 import React,{createContext, useState,useEffect} from "react"
 
-import LoadExercisesFromStorage from "../helpers/LoadExercisesFromStorage"
-import AddExercisesToStorage from "../helpers/AddExerciseToStorage"
-import checkIfExerciseExists from "../helpers/checkIfExerciseExists"
-import removeExerciseFromStorage from "../helpers/removeExerciseFromStorage"
+import LoadExercisesFromStorage from "../helpers/exercises/LoadExercisesFromStorage"
+import AddExercisesToStorage from "../helpers/exercises/AddExerciseToStorage"
+import checkIfExerciseExists from "../helpers/exercises/checkIfExerciseExists"
+import removeExerciseFromStorage from "../helpers/exercises/removeExerciseFromStorage"
 
 
 interface ContextProps{

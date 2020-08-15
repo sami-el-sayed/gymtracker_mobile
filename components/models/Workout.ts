@@ -1,5 +1,5 @@
 import Exercise from "./Exercise"
-import parseDate from "../helpers/parseDate";
+import parseDate from "../helpers/date/parseDate";
 
 export default class Workout {
     

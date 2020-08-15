@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-community/async-storage"
-import Workout from "../models/Workout"
-import getMonthYear from "./getMonthYear";
+import Workout from "../../models/Workout"
+import getMonthYear from "../date/getMonthYear";
 import checkIfWorkoutExists from "./checkIfWorkoutExists";
 
 //Adds workout to storage

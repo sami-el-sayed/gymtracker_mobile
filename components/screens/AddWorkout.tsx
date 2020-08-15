@@ -13,6 +13,7 @@ import Exercise from '../models/Exercise';
 import ExerciseFormView from '../ExerciseFormView';
 import Workout from '../models/Workout';
 import { useFocusEffect } from '@react-navigation/native';
+import addWorkoutValidation from '../helpers/form_validation/addWorkoutValidation';
 
 interface Props 
 {
@@ -86,6 +87,13 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
   //If editedWorkout is present means we want to EditWorkout
   //Else if editedWorkout is not present means we want to Add a Workout
   const addOrEditWorkout = async () => {
+
+    //if boolean false we have an error message
+    const workoutValidated:[boolean,string?] = addWorkoutValidation(localExercises);
+    if(workoutValidated[0] === false){
+      DropdownAlertRef.current?.alertWithType("error","Error!",`${workoutValidated[1]}`);
+      return
+    }
 
     const newWorkout:Workout = new Workout(workoutDate,localExercises);
 
@@ -170,7 +178,7 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
         </TouchableOpacity>
        </View>
        <FlatList data={localExercises} 
-       keyExtractor={(item)=>item.name}
+       keyExtractor={(item)=>localExercises.indexOf(item).toString()}
        renderItem={({item})=>
        <View style={styles.ExerciseContainer}>
          <Text style={styles.ExerciseText}>{item.name}</Text>

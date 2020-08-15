@@ -1,4 +1,4 @@
-import Workout from "components/models/Workout"
+import Workout from "../../models/Workout"
 
 
 const sortWorkouts = (workouts:Workout[]) : Workout[] => {

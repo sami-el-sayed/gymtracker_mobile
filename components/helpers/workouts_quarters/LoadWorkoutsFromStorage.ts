@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-community/async-storage"
 
-import Workout from "components/models/Workout"
+import Workout from "../../models/Workout"
 import sortWorkouts from "./sortWorkouts"
 
 const LoadWorkoutsFromStorage = async (dateKey:string) : Promise<[Workout[],string?]> => {

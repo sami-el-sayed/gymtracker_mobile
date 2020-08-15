@@ -1,5 +1,4 @@
-import getQuarter from "./getQuarter";
-import parseDate from "./parseDate";
+import getQuarter from "../workouts_quarters/getQuarter";
 
 
 const getMonthYear = (workoutDate:Date):string => {

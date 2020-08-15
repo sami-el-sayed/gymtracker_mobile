@@ -8,6 +8,7 @@ import DeleteIcon from "./icons/delete_icon.png";
 
 import Workout from './models/Workout';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import Exercises from './screens/Exercises';
 
 
 interface Props{
@@ -41,7 +42,7 @@ const WorkoutView:React.FC<Props> = ({workout,goToEditWorkout,deleteWorkout}) =>
         </View>
       </View>
       {workout.exercises.map((exercise)=>{
-       return <View key={exercise.name} style={styles.Exercise}>
+       return <View key={workout.exercises.indexOf(exercise).toString()} style={styles.Exercise}>
             <Text style={styles.ExerciseName}>{exercise.name}</Text>
             <View style={styles.ExerciseInfo}>
               <Text style={styles.SetsReps}>{exercise.points[0].sets} x {exercise.points[0].reps} </Text>

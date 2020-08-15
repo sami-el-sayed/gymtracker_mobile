@@ -4,6 +4,7 @@ import {Picker} from "@react-native-community/picker"
 import Point from './models/Point';
 import Exercise from './models/Exercise';
 import DropdownAlert from 'react-native-dropdownalert';
+import addExerciseToWorkoutValidation from './helpers/form_validation/addExerciseToWorkoutValidation';
 
 interface Props{
     exercise?:Exercise,
@@ -71,6 +72,7 @@ const ExerciseFormView:React.FC<Props> = ({exerciseNames, exercise,setShowExerci
         }
         return;
     }
+    
  
 
     const point:Point = new Point(
@@ -82,6 +84,16 @@ const ExerciseFormView:React.FC<Props> = ({exerciseNames, exercise,setShowExerci
     )
 
     const newExercise = new Exercise(exerciseForm.name,[point]);
+
+    const exerciseValidated = addExerciseToWorkoutValidation(newExercise);
+
+    if(exerciseValidated[0]===false){
+        if(dropDownAlert !== null){
+            dropDownAlert.alertWithType("error","Error!",`${exerciseValidated[1]}`)
+        }
+        return
+    }
+
     
     //If Exercise was passed means we dont want to add one, we want to edit it
     if(exercise)  editExercise(newExercise);

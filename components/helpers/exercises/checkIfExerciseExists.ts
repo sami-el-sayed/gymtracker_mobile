@@ -1,4 +1,4 @@
-import Workout from "../models/Workout";
+import Workout from "../../models/Workout";
 
 const checkIfExerciseExists = (exercises:string[],exerciseToAdd:string):boolean => {
 

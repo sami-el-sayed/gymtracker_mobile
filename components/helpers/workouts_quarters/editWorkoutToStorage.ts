@@ -1,7 +1,7 @@
-import Workout from "../models/Workout"
+import Workout from "../../models/Workout"
 import removeWorkoutFromStorage from "./removeWorkoutFromStorage"
 import AddWorkoutToStorage from "./AddWorkoutToStorage";
-import parseDate from "./parseDate";
+import parseDate from "../date/parseDate";
 import matchWorkouts from "./matchWorkouts";
 
 const editWorkoutToStorage = async (workout:Workout,originalWorkout:Workout,originalDate:Date) : Promise<[boolean,string?]> => {
