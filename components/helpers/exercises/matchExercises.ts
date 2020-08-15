@@ -7,9 +7,9 @@ const matchExercises = (exerciseA:Exercise,exerciseB:Exercise):boolean => {
     
     for (let i = 0; i < exerciseA.points.length; i++) {
 
-        if(exerciseA.points[i].reps !== exerciseA.points[i].reps) return false;
-        if(exerciseA.points[i].sets !== exerciseA.points[i].sets) return false;
-        if(exerciseA.points[i].weight !== exerciseA.points[i].weight) return false;
+        if(exerciseA.points[i].reps !== exerciseB.points[i].reps) return false;
+        if(exerciseA.points[i].sets !== exerciseB.points[i].sets) return false;
+        if(exerciseA.points[i].weight !== exerciseB.points[i].weight) return false;
       }
 
     return true;

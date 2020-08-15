@@ -1,6 +1,6 @@
 import Exercise from "../../models/Exercise";
 
-const addExerciseToWorkoutValidation = (exercise:Exercise,exercises:Exercise[]):[boolean,string?] =>  {
+const addExerciseToWorkoutValidation = (exercise:Exercise):[boolean,string?] =>  {
 
     const point = exercise.points[0];
 

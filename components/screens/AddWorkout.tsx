@@ -14,7 +14,7 @@ import ExerciseFormView from '../ExerciseFormView';
 import Workout from '../models/Workout';
 import { useFocusEffect } from '@react-navigation/native';
 import addWorkoutValidation from '../helpers/form_validation/addWorkoutValidation';
-import matchExercises from 'components/helpers/exercises/matchExercises';
+import matchExercises from '../helpers/exercises/matchExercises';
 
 interface Props 
 {
@@ -22,6 +22,8 @@ interface Props
   route:any;
 }
 
+//Screen for adding a new Workout
+//If Workout is passed in params it means we want to edit it 
 const AddWorkout:React.FC<Props> = ({navigation,route}) => {
 
   const {editedWorkout} = route.params;
@@ -33,14 +35,21 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
   const {addWorkout,saveEditedWorkout} = useContext(WorkoutContext)
   const {exercises} = useContext(ExerciseContext)
   
+  //State related to showing Date
   const [workoutDate,setWorkoutDate] = useState<Date>( editedWorkout ? new Date(editedWorkout.workoutDate) :  new Date())
   const [dateSet,setDateSet] = useState<boolean>(editedWorkout ? true: false)
   const [showDatePicker,setShowDatePicker] = useState<boolean>(false)
+
+  //state for errors
   const DropdownAlertRef = useRef<DropdownAlert | null>(null);
 
+  //state for exercises that we want to add to new workout
   const [localExercises,setLocalExercises] = useState<Exercise[]>(editedWorkout ? editedWorkout.exercises : [])
   const [showExerciseForm,setShowExerciseForm] = useState<boolean>(false)
   const [exerciseToEdit,setExerciseToEdit] = useState<Exercise | undefined>(undefined)
+
+  //For KeyboardAvoidingView
+  const [keyboardEnabled,setKeyboardEnabled] = useState<boolean>(false)
 
 
   //Sets Ids for exercises on render if editWorkout passed
@@ -57,14 +66,13 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
 
   useFocusEffect(
     useCallback(() => {
-      // Do something when the screen is focused
 
       return () => {
         resetState();
       };
     }, [])
   );
-
+  //Resets State when screen is left
   const resetState = () => {
     setWorkoutDate(new Date());
     setDateSet(false);
@@ -75,8 +83,6 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
   }
 
 
-  //For KeyboardAvoidingView
-  const [keyboardEnabled,setKeyboardEnabled] = useState<boolean>(false)
 
   const onDateChange = (event: Event, selectedDate:Date | undefined) => {
     const currentDate = selectedDate || workoutDate;
@@ -137,18 +143,22 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
       }
       
     }
+
+    //If found duplicate returns after displaying error
     if(foundDuplicate === true){
       DropdownAlertRef.current?.alertWithType("error","Error!", "Found Duplicate Exercise");
       return
     }
 
+    //Adds id for exercise so its easier to edit
     exerciseToAdd.id = localExercises.length;
+    console.log(exerciseToAdd)
     setLocalExercises([...localExercises,exerciseToAdd])
   }
 
 
   //Edits exercise based on ID
-  const editExercise = (exerciseToEdit:Exercise) => {
+  const editExercise = (readyEditedExercise:Exercise) => {
     if(exerciseToEdit === undefined) return
     if(exerciseToEdit.id === undefined) return
 
@@ -157,23 +167,29 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
     let foundDuplicate:boolean = false;
     for (let i = 0; i < localExercises.length; i++) {
 
-      if(matchExercises(exerciseToEdit,localExercises[i]) === true ){
+      if(exerciseToEdit.id === i) continue;
+
+      if(matchExercises(readyEditedExercise,localExercises[i]) === true ){
         foundDuplicate = true;
         break;
       }
       
     }
+
+    //If found duplicate returns after displaying error
     if(foundDuplicate === true){
       DropdownAlertRef.current?.alertWithType("error","Error!", "Found Duplicate Exercise");
+      setExerciseToEdit(undefined)
       return;
     }
 
-
-
+    //copies id as the ready to edit exercise doesnt have one and adds it to local exercises
+    readyEditedExercise.id = exerciseToEdit.id
     const exercisesCopy:Exercise[] = localExercises.slice();
-    exercisesCopy[exerciseToEdit.id] = exerciseToEdit;
-
+    exercisesCopy[exerciseToEdit.id] = readyEditedExercise;
     setLocalExercises(exercisesCopy);
+    setExerciseToEdit(undefined);
+
   } 
 
   //Sets Exercise to Edit into state

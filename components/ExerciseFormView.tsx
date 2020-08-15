@@ -85,13 +85,16 @@ const ExerciseFormView:React.FC<Props> = ({exerciseNames, exercise,setShowExerci
 
     const newExercise = new Exercise(exerciseForm.name,[point]);
 
+    console.log("NEW EXERCISE")
+    console.log(newExercise)
+
     const exerciseValidated = addExerciseToWorkoutValidation(newExercise);
 
     if(exerciseValidated[0]===false){
         if(dropDownAlert !== null){
             dropDownAlert.alertWithType("error","Error!",`${exerciseValidated[1]}`)
         }
-        return
+        return;
     }
 
     
