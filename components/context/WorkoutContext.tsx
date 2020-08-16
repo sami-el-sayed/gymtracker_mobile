@@ -27,6 +27,7 @@ export const WorkoutProvider: React.FunctionComponent = (props) => {
     const [workouts,setWorkouts] = useState<Workout[]>([])
     const [quarters,setQuarters] = useState<string[]>([])
     const [currentQuarterIdx,setcurrentQuarterIdx] = useState<number> (0)
+
     
 
     //Initially loads quarters and exercises

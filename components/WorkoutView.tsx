@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useState} from 'react';
 import {StyleSheet,Text, View, Image} from 'react-native';
 
 import EditIcon from "./icons/edit_icon.png";
@@ -12,39 +12,59 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 
 interface Props{
     workout:Workout,
-    goToEditWorkout:(workout:Workout)=>void,
-    deleteWorkout:(workout:Workout)=>void | undefined,
+    //Pass these two if coming from main Workouts Screen
+    goToEditWorkout?:(workout:Workout)=>void | undefined,
+    deleteWorkout?:(workout:Workout)=>void | undefined,
+    //Pass this if coming from Add Workout Screen 
+    //From Global Settings, if true collapse and dont show exercises on load
+    showCollapsedWorkouts:boolean | undefined
 }
 
-const WorkoutView:React.FC<Props> = ({workout,goToEditWorkout,deleteWorkout}) => { 
+const WorkoutView:React.FC<Props> = ({workout,goToEditWorkout,deleteWorkout,showCollapsedWorkouts}) => { 
+
+  const [collapsed,setCollapsed] = useState<boolean>(showCollapsedWorkouts ? showCollapsedWorkouts : false)
 
 
   //Sets workout to be edited as the workout in this component
-  const goToEditWorkoutHandler = () => goToEditWorkout(workout);
+  const goToEditWorkoutHandler = () => goToEditWorkout && goToEditWorkout(workout);
 
-  const deleteWorkoutHandler = () => {
-    deleteWorkout(workout);
-  }
+  //Deletes the passed Workout
+  const deleteWorkoutHandler = () =>  deleteWorkout && deleteWorkout(workout);
+
+  const switchCollapsed = () => setCollapsed(!collapsed)
   
-
   return (
     <View style={styles.Container}>
       <View style={styles.DateContainer}>
         <Text style={styles.Date}>{workout.workoutDate}</Text>
-        <View style={styles.IconContainer}>
-          <TouchableOpacity onPress={goToEditWorkoutHandler}>
-            <Image style={styles.Icon} source={EditIcon} />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={deleteWorkoutHandler}>
-            <Image style={styles.Icon} source={DeleteIcon} />
-          </TouchableOpacity>
+        {collapsed=== true ?
+         <TouchableOpacity onPress={switchCollapsed}>
+            <Text style={styles.ExpandIcon}>V</Text>
+         </TouchableOpacity>
+         :
+         <View/>
+        }
+            {goToEditWorkout !== undefined ?
+            //If goToEditWorkout === undefined means we coming from add Workout
+            //So we dont need icons
+            <View style={styles.IconContainer}>
+            <TouchableOpacity onPress={goToEditWorkoutHandler}>
+                <Image style={styles.Icon} source={EditIcon} />
+            </TouchableOpacity>
+             <TouchableOpacity onPress={deleteWorkoutHandler}>
+             <Image style={styles.Icon} source={DeleteIcon} />
+           </TouchableOpacity>
+           </View>
+            :
+            <View/>
+            }            
         </View>
-      </View>
-      {workout.exercises.map((exercise)=>{
-       return <View key={`${exercise.name+exercise.points[0].sets.toString()
-       +exercise.points[0].reps.toString()
-       +exercise.points[0].weight.toString()}
-       `} style={styles.Exercise}>
+      {collapsed === false ? 
+        workout.exercises.map((exercise)=>{
+        return <View key={`${exercise.name+exercise.points[0].sets.toString()
+        +exercise.points[0].reps.toString()
+        +exercise.points[0].weight.toString()}
+        `} style={styles.Exercise}>
             <Text style={styles.ExerciseName}>{exercise.name}</Text>
             <View style={styles.ExerciseInfo}>
               <Text style={styles.SetsReps}>{exercise.points[0].sets} x {exercise.points[0].reps} </Text>
@@ -52,7 +72,10 @@ const WorkoutView:React.FC<Props> = ({workout,goToEditWorkout,deleteWorkout}) =>
               <Text style={styles.Status}>{exercise.points[0].status}</Text>
             </View>
           </View>
-      })}
+      })
+      :
+      <View/>
+      }
     </View>
   );
 };
@@ -64,7 +87,7 @@ const styles = StyleSheet.create({
   },
   Date:{
     color:"#fff",
-    fontSize:32,
+    fontSize:26,
   },
   DateContainer:{
     width:"95%",
@@ -80,6 +103,12 @@ const styles = StyleSheet.create({
     width:20,
     height:20,
     marginRight:30
+  },
+  ExpandIcon:{
+    color:"#fff",
+    fontWeight:"700",
+    fontSize:20,
+    marginRight:50,
   },
   Exercise:{
     backgroundColor : "#3b3b3b",

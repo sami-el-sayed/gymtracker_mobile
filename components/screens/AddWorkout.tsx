@@ -14,7 +14,8 @@ import ExerciseFormView from '../ExerciseFormView';
 import Workout from '../models/Workout';
 import { useFocusEffect } from '@react-navigation/native';
 import addWorkoutValidation from '../helpers/form_validation/addWorkoutValidation';
-import matchExercises from '../helpers/exercises/matchExercises';
+import checkForDuplicateExercise from '../helpers/exercises/checkforDuplicateExercise';
+import createIds from '../helpers/exercises/createIds';
 
 interface Props 
 {
@@ -27,7 +28,9 @@ interface Props
 const AddWorkout:React.FC<Props> = ({navigation,route}) => {
 
   const {editedWorkout} = route.params;
+  const {copiedWorkout} = route.params;
   let originalWorkoutDate:Date;
+
 
   if(editedWorkout !==undefined) originalWorkoutDate = editedWorkout.workoutDate;
 
@@ -44,7 +47,7 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
   const DropdownAlertRef = useRef<DropdownAlert | null>(null);
 
   //state for exercises that we want to add to new workout
-  const [localExercises,setLocalExercises] = useState<Exercise[]>(editedWorkout ? editedWorkout.exercises : [])
+  const [localExercises,setLocalExercises] = useState<Exercise[]>( copiedWorkout ? copiedWorkout.exercises :  editedWorkout ? editedWorkout.exercises : [])
   const [showExerciseForm,setShowExerciseForm] = useState<boolean>(false)
   const [exerciseToEdit,setExerciseToEdit] = useState<Exercise | undefined>(undefined)
 
@@ -56,13 +59,20 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
   //Thanks to this exercises can be edited 
   useEffect(()=>{
     if(editedWorkout){ 
-      const exercisesCopy = localExercises.slice();
-      for (let i = 0; i < localExercises.length; i++) {
-        exercisesCopy[i].id = i;
-      }
+      const exercisesCopy = createIds(localExercises.slice());
       setLocalExercises(exercisesCopy);
     }
   },[editedWorkout])
+
+    //If Copie Workout is passed it sets its exercises to the one being copied
+    useEffect(()=>{
+      if(copiedWorkout) {
+        setLocalExercises(createIds(copiedWorkout.exercises));
+        DropdownAlertRef.current?.alertWithType("success","Workout Copied!","Now Pick a Date!");
+      }
+  
+    },[copiedWorkout])
+  
 
   useFocusEffect(
     useCallback(() => {
@@ -79,11 +89,11 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
     setShowDatePicker(false);
     setLocalExercises([]);
     setShowExerciseForm(false);
-    setExerciseToEdit(undefined)
+    setExerciseToEdit(undefined);
   }
 
 
-
+  //Changes Date when picked in Picker
   const onDateChange = (event: Event, selectedDate:Date | undefined) => {
     const currentDate = selectedDate || workoutDate;
     setWorkoutDate(currentDate);
@@ -134,16 +144,7 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
 
     //Checks for duplicat exercises with every local exercise in the array
     //If it finds one it returns 
-    let foundDuplicate:boolean = false;
-    for (let i = 0; i < localExercises.length; i++) {
-
-      if(matchExercises(exerciseToAdd,localExercises[i]) === true ){
-        foundDuplicate = true;
-        break;
-      }
-      
-    }
-
+    let foundDuplicate:boolean = checkForDuplicateExercise(exerciseToAdd,localExercises);
     //If found duplicate returns after displaying error
     if(foundDuplicate === true){
       DropdownAlertRef.current?.alertWithType("error","Error!", "Found Duplicate Exercise");
@@ -152,30 +153,17 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
 
     //Adds id for exercise so its easier to edit
     exerciseToAdd.id = localExercises.length;
-    console.log(exerciseToAdd)
     setLocalExercises([...localExercises,exerciseToAdd])
   }
 
 
   //Edits exercise based on ID
   const editExercise = (readyEditedExercise:Exercise) => {
-    if(exerciseToEdit === undefined) return
-    if(exerciseToEdit.id === undefined) return
-
+    if(readyEditedExercise.id === undefined) return
     //Checks for duplicat exercises with every local exercise in the array
     //If it finds one it returns 
-    let foundDuplicate:boolean = false;
-    for (let i = 0; i < localExercises.length; i++) {
-
-      if(exerciseToEdit.id === i) continue;
-
-      if(matchExercises(readyEditedExercise,localExercises[i]) === true ){
-        foundDuplicate = true;
-        break;
-      }
-      
-    }
-
+    let foundDuplicate:boolean = checkForDuplicateExercise(readyEditedExercise,localExercises);
+    
     //If found duplicate returns after displaying error
     if(foundDuplicate === true){
       DropdownAlertRef.current?.alertWithType("error","Error!", "Found Duplicate Exercise");
@@ -184,12 +172,10 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
     }
 
     //copies id as the ready to edit exercise doesnt have one and adds it to local exercises
-    readyEditedExercise.id = exerciseToEdit.id
     const exercisesCopy:Exercise[] = localExercises.slice();
-    exercisesCopy[exerciseToEdit.id] = readyEditedExercise;
+    exercisesCopy[readyEditedExercise.id] = readyEditedExercise;
     setLocalExercises(exercisesCopy);
     setExerciseToEdit(undefined);
-
   } 
 
   //Sets Exercise to Edit into state
@@ -200,7 +186,14 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
 
   //Deletes local exercise from added/edited workout
   const deleteExercise = (exerciseToDelete:Exercise) => {
-    setLocalExercises(localExercises.filter(exercise=>exercise.id !== exerciseToDelete.id))
+    let exercisesCopy:Exercise[] = localExercises.slice();
+    exercisesCopy = exercisesCopy.filter(exercise=>exercise.id !== exerciseToDelete.id);
+    setLocalExercises(createIds(exercisesCopy));
+  }
+
+  //Goes to the page that lets copying workouts
+  const copyWorkoutHandler=() => {
+    navigation.push("Copy Workout");
   }
 
 
@@ -218,6 +211,16 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
       >
           <Text style={styles.ButtonText}>Pick Workout Date</Text>
       </TouchableOpacity>
+      {localExercises.length === 0 ?
+       <TouchableOpacity
+       style={styles.ButtonWithMargin}
+       onPress={copyWorkoutHandler}
+      >
+        <Text style={styles.ButtonText}>Copy Workout</Text>
+      </TouchableOpacity>
+      :
+      <View/>
+      }
     </View>
     :
     <View>
@@ -261,7 +264,6 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
        :
         <View/>
        }
-
      </View>
      :
      <ExerciseFormView
@@ -335,6 +337,7 @@ const styles = StyleSheet.create({
     justifyContent:"space-evenly",
     paddingLeft:2,
     paddingRight:15,
+    padding:8,
   },
   ExerciseText:{
     fontSize:16,

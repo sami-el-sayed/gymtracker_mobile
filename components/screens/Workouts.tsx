@@ -3,6 +3,8 @@ import {StyleSheet,Text, FlatList, View, TouchableOpacity, Alert} from 'react-na
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 import {WorkoutContext} from "../context/WorkoutContext"
+import {SettingsContext} from "../context/SettingsContext"
+
 
 import WorkoutView from "../WorkoutView";
 import Workout from '../models/Workout';
@@ -17,6 +19,8 @@ interface Props
 const Workouts:React.FC<Props> = ({navigation}) => {
  
   const {workouts,deleteWorkout,loadWorkouts} = useContext(WorkoutContext)
+  const {showCollapsedWorkouts} = useContext(SettingsContext)
+
 
   const [filteredWorkouts,setFilteredWorkouts] = useState<Workout[]>([])
 
@@ -172,7 +176,8 @@ const Workouts:React.FC<Props> = ({navigation}) => {
       renderItem={({item}) =>
       <WorkoutView 
       deleteWorkout={deleteWorkoutHandler}
-      goToEditWorkout={goToAddWorkoutHandler} 
+      goToEditWorkout={goToAddWorkoutHandler}
+      showCollapsedWorkouts={showCollapsedWorkouts} 
       workout={item}/>}
       />
       <TouchableOpacity

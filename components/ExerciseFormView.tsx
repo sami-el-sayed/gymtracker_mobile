@@ -73,7 +73,6 @@ const ExerciseFormView:React.FC<Props> = ({exerciseNames, exercise,setShowExerci
         return;
     }
     
- 
 
     const point:Point = new Point(
         new Date(),
@@ -82,11 +81,13 @@ const ExerciseFormView:React.FC<Props> = ({exerciseNames, exercise,setShowExerci
         parseFloat(exerciseForm.weight),
         exerciseForm.status,
     )
-
+    
+    //Creates ready exercise, if exercise present we can copy its Id
     const newExercise = new Exercise(exerciseForm.name,[point]);
 
-    console.log("NEW EXERCISE")
-    console.log(newExercise)
+    if(exercise !== undefined){
+        newExercise.id = exercise.id
+    }
 
     const exerciseValidated = addExerciseToWorkoutValidation(newExercise);
 
