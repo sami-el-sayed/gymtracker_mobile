@@ -6,7 +6,9 @@ import saveSettingsToStorage from "../helpers/saveSettingsToStorage"
 
 interface ContextProps{
     showCollapsedWorkouts:boolean,
-    switchShowCollapsedWorkouts:(show:boolean)=>void
+    switchShowCollapsedWorkouts:(show:boolean)=>void,
+    switchUnits:(inKg:boolean) => void,
+
 }
 
 export const SettingsContext = createContext<Partial<ContextProps>>({})
@@ -15,6 +17,7 @@ export const SettingsProvider: React.FunctionComponent = (props) => {
 
 
     const [showCollapsedWorkouts,setShowCollapsedWorkouts] = useState<boolean>(false)
+
 
     //Initially loads quarters and exercises
     useEffect(()=>{
@@ -32,14 +35,19 @@ export const SettingsProvider: React.FunctionComponent = (props) => {
         const newSettings = new GlobalSettings(show);
         saveSettingsToStorage(newSettings);
     }
-   
+    
+    const switchUnits = (inKg:boolean) =>{
+        const newSettings = new GlobalSettings(showCollapsedWorkouts);
+        saveSettingsToStorage(newSettings);
+    } 
 
     
     return (
         <SettingsContext.Provider
         value={{
             showCollapsedWorkouts,
-            switchShowCollapsedWorkouts
+            switchShowCollapsedWorkouts,
+            switchUnits
         }}
         >
         {props.children}

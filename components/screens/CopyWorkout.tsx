@@ -16,6 +16,7 @@ const CopyWorkout:React.FC<Props> = ({navigation}) => {
  
   const {workouts} = useContext(WorkoutContext)
 
+
   const copyWorkout = (workout:Workout) => {
     navigation.navigate("Add Workout",{copiedWorkout:workout});
   }

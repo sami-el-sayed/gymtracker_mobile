@@ -7,6 +7,10 @@ import editWorkoutToStorage from "../helpers/workouts_quarters/editWorkoutToStor
 import getAllQuartersAndYearsSorted from "../helpers/workouts_quarters/getAllQuartersAndYearsSorted"
 import removeWorkoutFromStorage from "../helpers/workouts_quarters/removeWorkoutFromStorage"
 import sortWorkouts from "../helpers/workouts_quarters/sortWorkouts"
+import clearWorkoutsFromStorage from "../helpers/clearWorkoutsFromStorage"
+
+
+const WORKOUT_LOOP_LIMIT = 40
 
 
 interface ContextProps{
@@ -16,28 +20,23 @@ interface ContextProps{
     saveEditedWorkout:(workout:Workout,originalWorkout:Workout,originalWorkoutDate:Date) =>Promise<[boolean,string?]>,
     quarters:string[],
     currentQuarterIdx:number,
-    deleteWorkout:(workoutToRemove:Workout)=>void
+    deleteWorkout:(workoutToRemove:Workout)=>void,
+    deleteAllWorkouts:()=>void,
 }
 
 export const WorkoutContext = createContext<Partial<ContextProps>>({})
 
 export const WorkoutProvider: React.FunctionComponent = (props) => {
 
-
     const [workouts,setWorkouts] = useState<Workout[]>([])
     const [quarters,setQuarters] = useState<string[]>([])
     const [currentQuarterIdx,setcurrentQuarterIdx] = useState<number> (0)
 
     
-
     //Initially loads quarters and exercises
     useEffect(()=>{
-        intialLoad();
+        loadQuarters();
     },[])
-
-    async function intialLoad(){
-        await loadQuarters();
-    }
 
     //When quarters are loaded it loads workouts based on those quarters
     useEffect(()=>{
@@ -67,7 +66,7 @@ export const WorkoutProvider: React.FunctionComponent = (props) => {
         for (let i:number = startInt; i < quarters.length; i++) {
             const result:[Workout[],string?] = await LoadWorkoutsFromStorage(quarters[i]);
             workouts = workouts.concat(result[0]);
-            if(workouts.length > 40 ) break;                
+            if(workouts.length > WORKOUT_LOOP_LIMIT ) break;                
         }
 
         setcurrentQuarterIdx(currentQuarterIdx+1);
@@ -91,7 +90,7 @@ export const WorkoutProvider: React.FunctionComponent = (props) => {
     //Func called from other Views such as lists when top is reached
     async function loadWorkouts() {
         //Checks if atleast 40 workouts have been initially loaded
-        if(workouts.length < 40) return;
+        if(workouts.length < WORKOUT_LOOP_LIMIT) return;
         else{
             const workoutsTemp = workouts.slice();
             const loadedWorkouts = await LoadWorkoutsLoop(currentQuarterIdx);
@@ -100,7 +99,6 @@ export const WorkoutProvider: React.FunctionComponent = (props) => {
     }
 
     
-
     
     //Saves Edited Workout
     const saveEditedWorkout = async (workout:Workout,originalWorkout:Workout,originalWorkoutDate:Date):Promise<[boolean,string?]>  => {
@@ -124,6 +122,12 @@ export const WorkoutProvider: React.FunctionComponent = (props) => {
 
     }
 
+    const deleteAllWorkouts = async () => {
+        await clearWorkoutsFromStorage();
+        setQuarters([]);
+        setWorkouts([]);
+    }
+
     
     return (
         <WorkoutContext.Provider
@@ -134,7 +138,8 @@ export const WorkoutProvider: React.FunctionComponent = (props) => {
             saveEditedWorkout,
             addWorkout,
             loadWorkouts,
-            deleteWorkout
+            deleteWorkout,
+            deleteAllWorkouts
         }}
         >
         {props.children}

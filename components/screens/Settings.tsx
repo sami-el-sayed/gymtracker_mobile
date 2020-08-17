@@ -1,21 +1,56 @@
-import React,{useContext,useRef} from 'react';
-import {StyleSheet,Text, TouchableOpacity, View} from 'react-native';
+import React,{useContext,useEffect,useRef} from 'react';
+import {StyleSheet,Text, TouchableOpacity, View, Alert} from 'react-native';
 import {SettingsContext} from "../context/SettingsContext"
-import clearAppData from '../helpers/clearAppData';
+import {WorkoutContext} from "../context/WorkoutContext"
+import {ExerciseContext} from '../context/ExerciseContext';
 import DropdownAlert from 'react-native-dropdownalert';
+
+
 
 
 const Settings:React.FC = () => {
 
   const {showCollapsedWorkouts,switchShowCollapsedWorkouts} = useContext(SettingsContext)
+
+  const {deleteAllWorkouts} = useContext(WorkoutContext)
+  const {deleteAllExercises} = useContext(ExerciseContext)
+
+
   const DropdownAlertRef = useRef<DropdownAlert | null>(null);
 
 
   const setShowCollapsedWorkoutsHandler = (show:boolean) => {
     switchShowCollapsedWorkouts && switchShowCollapsedWorkouts(show);
-    DropdownAlertRef?.current?.alertWithType("info","Your Settings have been changed","Reset your application to see effects")
-
+    DropdownAlertRef?.current?.alertWithType("info","Your Settings have been changed!","Reset your application to see effects")
   }
+
+
+  //handler for deleting all workouts from storage
+  const deleteWorkoutsButtonHandler = () => {
+      Alert.alert(
+      "Are you sure about deleting All Workouts?",
+      "All Your Progress will be gone!",
+      [
+        { text: "OK", onPress: () => deleteAllWorkouts && deleteAllWorkouts()},
+        {text: "Cancel",onPress: () => {}, style: "cancel"},
+      ],
+      { cancelable: false }
+      );
+  }
+
+  //handler for deleting all exercises from storage
+  const deleteExercisesHandler = () => {
+    Alert.alert(
+    "Are you sure about deleting All Exercises?",
+    "You won't be able to add them to new Workouts!",
+    [
+      { text: "OK", onPress: () => deleteAllExercises && deleteAllExercises()},
+      {text: "Cancel",onPress: () => {}, style: "cancel"},
+    ],
+    { cancelable: false }
+    );
+}
+
 
   return (
     <View style={styles.Container}>
@@ -29,39 +64,30 @@ const Settings:React.FC = () => {
         style={styles.smallButton}
         >
           <Text style={showCollapsedWorkouts === true ? styles.TextActive : styles.Text}>Yes</Text>
-    </TouchableOpacity>
-    
-    <TouchableOpacity
-      style={styles.smallButton}
-      onPress={()=>setShowCollapsedWorkoutsHandler(false)}
-     >
-       <Text style={showCollapsedWorkouts === false ? styles.TextActive : styles.Text}>No</Text>
-    </TouchableOpacity>
-    </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+        style={styles.smallButton}
+        onPress={()=>setShowCollapsedWorkoutsHandler(false)}
+        >
+          <Text style={showCollapsedWorkouts === false ? styles.TextActive : styles.Text}>No</Text>
+        </TouchableOpacity>
+        </View>
       </View>
 
      <TouchableOpacity
       style={styles.Button}
-      onPress={()=>clearAppData()} 
+      onPress={deleteWorkoutsButtonHandler} 
      >
        <Text style={styles.Text}>
-          CLEAR WORKOUTS STARTING FROM 2 QUARTERS AGO
+          CLEAR ALL WORKOUTS 
        </Text>
     </TouchableOpacity>
     <TouchableOpacity
       style={styles.Button}
-      onPress={()=>clearAppData()} 
+      onPress={deleteExercisesHandler} 
      >
        <Text style={styles.Text}>
           CLEAR ALL EXERCISES
-       </Text>
-    </TouchableOpacity>
-    <TouchableOpacity
-      style={styles.Button}
-      onPress={()=>clearAppData()} 
-     >
-       <Text style={styles.Text}>
-          CLEAR APP DATA DEBUG
        </Text>
     </TouchableOpacity>
     <DropdownAlert ref={DropdownAlertRef}/>

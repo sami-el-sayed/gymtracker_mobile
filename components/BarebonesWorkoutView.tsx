@@ -1,8 +1,6 @@
 import React from 'react';
 import {StyleSheet,Text, View} from 'react-native';
 
-
-
 import Workout from './models/Workout';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
@@ -14,11 +12,10 @@ interface Props{
 //Using this View if no icons nor state is needed like for Copy Workout
 const BarebonesWorkoutView:React.FC<Props> = ({workout,copyWorkout}) => { 
 
-
   //If coming from Add Workout lets copy Workout when touching date
   const copyWorkoutHandler = () => copyWorkout && copyWorkout(workout);
 
-  
+
   return (
     <View style={styles.Container}>
       <TouchableOpacity onPress={copyWorkoutHandler}>
@@ -34,7 +31,7 @@ const BarebonesWorkoutView:React.FC<Props> = ({workout,copyWorkout}) => {
             <Text style={styles.ExerciseName}>{exercise.name}</Text>
             <View style={styles.ExerciseInfo}>
               <Text style={styles.SetsReps}>{exercise.points[0].sets} x {exercise.points[0].reps} </Text>
-              <Text style={styles.Weight}>Weight:  {exercise.points[0].weight}kg</Text>
+              <Text style={styles.Weight}>Weight: {exercise.points[0].weight}kg</Text>
               <Text style={styles.Status}>{exercise.points[0].status}</Text>
             </View>
           </View>

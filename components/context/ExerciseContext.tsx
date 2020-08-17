@@ -4,12 +4,14 @@ import LoadExercisesFromStorage from "../helpers/exercises/LoadExercisesFromStor
 import AddExercisesToStorage from "../helpers/exercises/AddExerciseToStorage"
 import checkIfExerciseExists from "../helpers/exercises/checkIfExerciseExists"
 import removeExerciseFromStorage from "../helpers/exercises/removeExerciseFromStorage"
+import clearExercisesFromStorage from "../helpers/clearExercisesFromStorage"
 
 
 interface ContextProps{
     exercises:string[],
     addExercise:(exercise:string)=>Promise<[boolean,string?]>,
     deleteExecise:(exercise:string) => void,
+    deleteAllExercises:()=>void,
 }
 
 export const ExerciseContext = createContext<Partial<ContextProps>>({})
@@ -59,6 +61,11 @@ export const ExerciseProvider: React.FunctionComponent = (props) => {
         setExercises(result[0])
     }
 
+    async function deleteAllExercises(){
+        await clearExercisesFromStorage();
+        setExercises([])
+    }
+
 
     
     return (
@@ -67,6 +74,7 @@ export const ExerciseProvider: React.FunctionComponent = (props) => {
             exercises,
             addExercise,
             deleteExecise,
+            deleteAllExercises
         }}
         >
         {props.children}

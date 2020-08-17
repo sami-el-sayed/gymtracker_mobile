@@ -16,6 +16,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import addWorkoutValidation from '../helpers/form_validation/addWorkoutValidation';
 import checkForDuplicateExercise from '../helpers/exercises/checkforDuplicateExercise';
 import createIds from '../helpers/exercises/createIds';
+import convertKgToLbs from '../helpers/convertKgToLbs';
 
 interface Props 
 {
@@ -37,6 +38,7 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
 
   const {addWorkout,saveEditedWorkout} = useContext(WorkoutContext)
   const {exercises} = useContext(ExerciseContext)
+
   
   //State related to showing Date
   const [workoutDate,setWorkoutDate] = useState<Date>( editedWorkout ? new Date(editedWorkout.workoutDate) :  new Date())
@@ -140,8 +142,9 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
 
   //Adds Exercise to Workout Exercises Array
   //Adds ID for easier editing
-  const addExerciseToWorkout = (exerciseToAdd:Exercise) => {
 
+
+  const addExerciseToWorkout = (exerciseToAdd:Exercise) => {
     //Checks for duplicat exercises with every local exercise in the array
     //If it finds one it returns 
     let foundDuplicate:boolean = checkForDuplicateExercise(exerciseToAdd,localExercises);
@@ -159,6 +162,7 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
 
   //Edits exercise based on ID
   const editExercise = (readyEditedExercise:Exercise) => {
+ 
     if(readyEditedExercise.id === undefined) return
     //Checks for duplicat exercises with every local exercise in the array
     //If it finds one it returns 

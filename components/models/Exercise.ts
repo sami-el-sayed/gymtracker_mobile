@@ -7,7 +7,7 @@ export default class Exercise {
     name: string;
     points: Point[];
 
-    constructor(_name: string,_points?:Point[],_id?:number) {
+    constructor(_name: string,_points?:Point[],_id?:number,_inLbs?:boolean) {
       this.name = _name;
 
       if(_points !== null && _points !== undefined && _points.length > 0) this.points = _points;

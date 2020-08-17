@@ -7,5 +7,5 @@ export default class GlobalSettings {
     constructor(_showCollapsedWorkouts:boolean){
         this.showCollapsedWorkouts = _showCollapsedWorkouts;
     }
-
+    
 }

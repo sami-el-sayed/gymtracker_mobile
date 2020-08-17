@@ -5,6 +5,7 @@ import loadProgress from '../helpers/exercises/loadExerciseProgress';
 import Point from '../models/Point';
 import LoadWorkoutsFromStorage from '../helpers/workouts_quarters/LoadWorkoutsFromStorage';
 import Workout from '../models/Workout';
+import sortWorkouts from '../helpers/workouts_quarters/sortWorkouts';
 
 interface Props 
 {
@@ -17,7 +18,8 @@ const ExerciseDetail:React.FC<Props> = ({route}) => {
 
   const {workouts,currentQuarterIdx,quarters} = useContext(WorkoutContext)
 
-  const [ExerciseProgress,setExerciseProgress] = useState<Point[]>([])
+
+  const [ExerciseProgress,setExerciseProgress] = useState<Workout[]>([])
 
 
   useEffect(()=>{
@@ -31,18 +33,18 @@ const ExerciseDetail:React.FC<Props> = ({route}) => {
   const loadPoints = async () => {
     if(workouts === undefined) return;
     if(currentQuarterIdx === undefined) return;
-    if(quarters === undefined) return;
-    let points:Point[] = sortPoints(loadProgress(workouts,exercise));
-    let loadedWorkouts:Workout[] = [];
+    if(quarters === undefined) return; 
+    
+    let filteredWorkouts:Workout[] = sortWorkouts(loadProgress(workouts,exercise));
     if(currentQuarterIdx !== quarters.length-1){
 
       for (let i = currentQuarterIdx; i < quarters.length; i++) {
          const result = await LoadWorkoutsFromStorage(quarters[i]);
-         loadedWorkouts = loadedWorkouts.concat(result[0]);
+         filteredWorkouts = filteredWorkouts.concat(result[0]);
       }
-      setExerciseProgress(points.concat(sortPoints(loadProgress(loadedWorkouts,exercise))));
+      setExerciseProgress(sortWorkouts(loadProgress(filteredWorkouts,exercise)))
     }
-    else setExerciseProgress(points);
+    else setExerciseProgress(filteredWorkouts);
     
 
   }
@@ -53,17 +55,26 @@ const ExerciseDetail:React.FC<Props> = ({route}) => {
       style={styles.List}
       inverted={true}
       data={ExerciseProgress}
-      keyExtractor={(item)=>item.date.toString()}
+      keyExtractor={(workout)=>workout.workoutDate.toString()}
       renderItem={({item})=>
       <View style={styles.ItemContainer}>
         <View style={styles.DateContainer}>
-          <Text style={styles.Date}>{ item.date.toString().split("00:")[0]}</Text>
+          <Text style={styles.Date}>{ item.workoutDate.toString()}</Text>
         </View>
-        <View style={styles.Point}>
-          <Text style={styles.SetsReps}>{item.sets} x {item.reps}</Text>
-          <Text style={styles.Weight}>{item.weight}kg</Text>
-          <Text style={styles.Status}>{item.status}</Text>
-        </View>
+        {item.exercises.map((exercise)=>{
+          return(
+           <View style={styles.Point}
+           key={`${exercise.name+exercise.points[0].sets.toString()
+            +exercise.points[0].reps.toString()
+            +exercise.points[0].weight.toString()}
+           `} 
+           >
+           <Text style={styles.SetsReps}>{exercise.points[0].sets} x {exercise.points[0].sets}</Text>
+           <Text style={styles.Weight}>{exercise.points[0].weight}kg</Text>
+           <Text style={styles.Status}>{exercise.points[0].status}</Text>
+         </View>
+          )
+        })}
       </View>
       }
       />

@@ -13,7 +13,7 @@ interface Props{
     addExerciseToWorkout:(exercise:Exercise) => void,
     setShowExerciseForm:Function,
     setKeyboardEnabled:Function,
-    dropDownAlert:DropdownAlert | null
+    dropDownAlert:DropdownAlert | null,
 }
 
 //View for adding Exercises to Workout

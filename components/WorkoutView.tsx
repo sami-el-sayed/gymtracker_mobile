@@ -4,23 +4,24 @@ import {StyleSheet,Text, View, Image} from 'react-native';
 import EditIcon from "./icons/edit_icon.png";
 import DeleteIcon from "./icons/delete_icon.png";
 
-
-
 import Workout from './models/Workout';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import convertKgToLbs from './helpers/convertKgToLbs';
 
 
 interface Props{
     workout:Workout,
-    //Pass these two if coming from main Workouts Screen
     goToEditWorkout?:(workout:Workout)=>void | undefined,
     deleteWorkout?:(workout:Workout)=>void | undefined,
-    //Pass this if coming from Add Workout Screen 
-    //From Global Settings, if true collapse and dont show exercises on load
-    showCollapsedWorkouts:boolean | undefined
+    //From Global Settings
+    //if true collapse and dont show exercises on load
+    showCollapsedWorkouts:boolean | undefined,
+    //if true show weight in Lbs
+
 }
 
 const WorkoutView:React.FC<Props> = ({workout,goToEditWorkout,deleteWorkout,showCollapsedWorkouts}) => { 
+
 
   const [collapsed,setCollapsed] = useState<boolean>(showCollapsedWorkouts ? showCollapsedWorkouts : false)
 
@@ -68,7 +69,7 @@ const WorkoutView:React.FC<Props> = ({workout,goToEditWorkout,deleteWorkout,show
             <Text style={styles.ExerciseName}>{exercise.name}</Text>
             <View style={styles.ExerciseInfo}>
               <Text style={styles.SetsReps}>{exercise.points[0].sets} x {exercise.points[0].reps} </Text>
-              <Text style={styles.Weight}>Weight:  {exercise.points[0].weight}kg</Text>
+              <Text style={styles.Weight}>Weight: {exercise.points[0].weight}kg</Text>
               <Text style={styles.Status}>{exercise.points[0].status}</Text>
             </View>
           </View>

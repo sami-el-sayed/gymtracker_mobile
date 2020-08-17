@@ -172,7 +172,7 @@ const Workouts:React.FC<Props> = ({navigation}) => {
       style={styles.List}
       inverted data={filteredWorkouts} 
       keyExtractor={(item)=> item.workoutDate}
-      onEndReached={loadWorkoutsHandler}
+      onEndReached={(loadWorkoutsHandler)}
       renderItem={({item}) =>
       <WorkoutView 
       deleteWorkout={deleteWorkoutHandler}
