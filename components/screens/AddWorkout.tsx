@@ -95,6 +95,7 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
   }
 
 
+
   //Changes Date when picked in Picker
   const onDateChange = (event: Event, selectedDate:Date | undefined) => {
     const currentDate = selectedDate || workoutDate;
@@ -122,7 +123,7 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
       if(saved[0] !== true){
         DropdownAlertRef.current?.alertWithType("error","Error!",saved[1] ? saved[1] : "An Error Occured");
       }
-      else navigation.push("Workouts") 
+      else navigation.navigate("Workouts") 
     } 
     //ese we are adding a new Workout
     else if(addWorkout) {
@@ -130,7 +131,7 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
       if(saved[0] !== true){
         DropdownAlertRef.current?.alertWithType("error","Error!",saved[1] ? saved[1] : "An Error Occured");
       }
-      else navigation.push("Workouts") 
+      else navigation.navigate("Workouts") 
     }
   }
 

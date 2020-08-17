@@ -10,6 +10,7 @@ const matchExercises = (exerciseA:Exercise,exerciseB:Exercise):boolean => {
         if(exerciseA.points[i].reps !== exerciseB.points[i].reps) return false;
         if(exerciseA.points[i].sets !== exerciseB.points[i].sets) return false;
         if(exerciseA.points[i].weight !== exerciseB.points[i].weight) return false;
+        if(exerciseA.points[i].status !== exerciseB.points[i].status) return false;
       }
 
     return true;

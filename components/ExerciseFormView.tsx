@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Text, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import {Picker} from "@react-native-community/picker"
 import Point from './models/Point';
@@ -22,13 +22,14 @@ const ExerciseFormView:React.FC<Props> = ({exerciseNames, exercise,setShowExerci
     
  //If Exercise is passed loads exercise parameters into form
  const [exerciseForm,setExerciseForm] = useState({
-     name: exercise ? exercise.name : "",
+    //Had Error where name was "" on adding new exercise
+    //Hack way to fix it take the first element of the array 
+     name: exercise ? exercise.name : exerciseNames ? exerciseNames[0] : "",
      sets:exercise ? exercise.points[0].sets.toString() : "",
      reps:exercise ? exercise.points[0].reps.toString() : "",
      weight:exercise ? exercise.points[0].weight.toString() : "",
-     status: exercise ? exercise.points[0].status : "success"
+     status: exercise ? exercise.points[0].status.toString() : "success"
  });
-
 
  //Handler which determines which parameter of the workout form should be changed based on input
  const onChangeHandler = (parameter:string,value:string) => {
@@ -59,13 +60,12 @@ const ExerciseFormView:React.FC<Props> = ({exerciseNames, exercise,setShowExerci
  //So it doesnt add the Exercise, it edits it 
  const saveHandler = () => {
 
+    console.log(exerciseForm)
+
     if(
-        exerciseForm.name === "" || 
-        exerciseForm.sets === "" ||
-        exerciseForm.reps === "" ||
-        exerciseForm.weight === "" ||
-        exerciseForm.status === "" 
-    )
+        exerciseForm.name === "" ||  exerciseForm.sets === "" ||
+        exerciseForm.reps === "" || exerciseForm.weight === "" ||
+        exerciseForm.status === "" )
     {   
         if(dropDownAlert !== null){
             dropDownAlert.alertWithType("error","Error!","Fill out every field!")
@@ -73,7 +73,6 @@ const ExerciseFormView:React.FC<Props> = ({exerciseNames, exercise,setShowExerci
         return;
     }
     
-
     const point:Point = new Point(
         new Date(),
         parseInt(exerciseForm.sets),
@@ -84,7 +83,6 @@ const ExerciseFormView:React.FC<Props> = ({exerciseNames, exercise,setShowExerci
     
     //Creates ready exercise, if exercise present we can copy its Id
     const newExercise = new Exercise(exerciseForm.name,[point]);
-
     if(exercise !== undefined){
         newExercise.id = exercise.id
     }
@@ -102,6 +100,7 @@ const ExerciseFormView:React.FC<Props> = ({exerciseNames, exercise,setShowExerci
     //If Exercise was passed means we dont want to add one, we want to edit it
     if(exercise)  editExercise(newExercise);
     else  addExerciseToWorkout(newExercise);
+
     setShowExerciseForm(false);
  }
  
