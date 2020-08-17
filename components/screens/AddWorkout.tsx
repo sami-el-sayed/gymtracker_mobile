@@ -84,6 +84,7 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
       };
     }, [])
   );
+  
   //Resets State when screen is left
   const resetState = () => {
     setWorkoutDate(new Date());
@@ -123,7 +124,10 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
       if(saved[0] !== true){
         DropdownAlertRef.current?.alertWithType("error","Error!",saved[1] ? saved[1] : "An Error Occured");
       }
-      else navigation.navigate("Workouts") 
+      else {
+        navigation.navigate("Workouts");
+        resetState();
+      } 
     } 
     //ese we are adding a new Workout
     else if(addWorkout) {
@@ -131,7 +135,10 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
       if(saved[0] !== true){
         DropdownAlertRef.current?.alertWithType("error","Error!",saved[1] ? saved[1] : "An Error Occured");
       }
-      else navigation.navigate("Workouts") 
+      else {
+        navigation.navigate("Workouts");
+        resetState();
+      }
     }
   }
 
