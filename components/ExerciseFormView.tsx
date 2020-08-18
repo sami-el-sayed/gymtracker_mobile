@@ -60,8 +60,6 @@ const ExerciseFormView:React.FC<Props> = ({exerciseNames, exercise,setShowExerci
  //So it doesnt add the Exercise, it edits it 
  const saveHandler = () => {
 
-    console.log(exerciseForm)
-
     if(
         exerciseForm.name === "" ||  exerciseForm.sets === "" ||
         exerciseForm.reps === "" || exerciseForm.weight === "" ||

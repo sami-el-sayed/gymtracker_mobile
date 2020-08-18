@@ -19,10 +19,10 @@ interface Props{
     //if true show weight in Lbs
 
 }
-
+//View of single Workout 
 const WorkoutView:React.FC<Props> = ({workout,goToEditWorkout,deleteWorkout,showCollapsedWorkouts}) => { 
 
-
+  //Collapse exercises for Workout
   const [collapsed,setCollapsed] = useState<boolean>(showCollapsedWorkouts ? showCollapsedWorkouts : false)
 
 
@@ -38,17 +38,19 @@ const WorkoutView:React.FC<Props> = ({workout,goToEditWorkout,deleteWorkout,show
     <View style={styles.Container}>
       <View style={styles.DateContainer}>
         <Text style={styles.Date}>{workout.workoutDate}</Text>
-        {collapsed=== true ?
-         <TouchableOpacity onPress={switchCollapsed}>
-            <Text style={styles.ExpandIcon}>V</Text>
-         </TouchableOpacity>
-         :
-         <View/>
-        }
             {goToEditWorkout !== undefined ?
             //If goToEditWorkout === undefined means we coming from add Workout
             //So we dont need icons
             <View style={styles.IconContainer}>
+               {showCollapsedWorkouts=== true ?
+        <View style={collapsed=== false ? styles.ExpandIconContainerRotated : styles.ExpandIconContainer}>
+         <TouchableOpacity onPress={switchCollapsed}>
+            <Text style={styles.ExpandIcon}>V</Text>
+         </TouchableOpacity>
+         </View>
+         :
+         <View/>
+        }
             <TouchableOpacity onPress={goToEditWorkoutHandler}>
                 <Image style={styles.Icon} source={EditIcon} />
             </TouchableOpacity>
@@ -88,7 +90,7 @@ const styles = StyleSheet.create({
   },
   Date:{
     color:"#fff",
-    fontSize:26,
+    fontSize:24,
   },
   DateContainer:{
     width:"95%",
@@ -98,30 +100,38 @@ const styles = StyleSheet.create({
     justifyContent:"space-between"
   },
   IconContainer:{
-    flexDirection:"row"
+    width:"40%",
+    flexDirection:"row",
+    alignItems:"center",
+    justifyContent:"space-between",
+    paddingRight:20,
   },
   Icon:{
     width:20,
     height:20,
-    marginRight:30
   },
   ExpandIcon:{
     color:"#fff",
     fontWeight:"700",
-    fontSize:20,
-    marginRight:50,
+    fontSize:26,
+  },
+  ExpandIconContainer:{
+
+  },
+  ExpandIconContainerRotated:{
+    transform: [{rotateX:"180deg"}]
   },
   Exercise:{
     backgroundColor : "#3b3b3b",
     paddingLeft:5,
     paddingRight:10,
-    marginTop:15,
+    marginTop:10,
     marginBottom:5,
     paddingBottom:2,
     maxWidth:"75%"
   },
   ExerciseName:{
-    fontSize:20,
+    fontSize:18,
     color:"#fff"
   },
   ExerciseInfo:{

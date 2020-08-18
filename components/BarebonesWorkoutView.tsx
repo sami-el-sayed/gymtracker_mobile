@@ -15,7 +15,6 @@ const BarebonesWorkoutView:React.FC<Props> = ({workout,copyWorkout}) => {
   //If coming from Add Workout lets copy Workout when touching date
   const copyWorkoutHandler = () => copyWorkout && copyWorkout(workout);
 
-
   return (
     <View style={styles.Container}>
       <TouchableOpacity onPress={copyWorkoutHandler}>

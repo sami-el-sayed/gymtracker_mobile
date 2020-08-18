@@ -16,7 +16,6 @@ import { useFocusEffect } from '@react-navigation/native';
 import addWorkoutValidation from '../helpers/form_validation/addWorkoutValidation';
 import checkForDuplicateExercise from '../helpers/exercises/checkforDuplicateExercise';
 import createIds from '../helpers/exercises/createIds';
-import convertKgToLbs from '../helpers/convertKgToLbs';
 
 interface Props 
 {
@@ -164,7 +163,7 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
 
     //Adds id for exercise so its easier to edit
     exerciseToAdd.id = localExercises.length;
-    setLocalExercises([...localExercises,exerciseToAdd])
+    setLocalExercises([...localExercises,exerciseToAdd]);
   }
 
 
@@ -248,16 +247,20 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
        keyExtractor={(item)=>(`${item.name+item.points[0].sets.toString()+item.points[0].reps.toString()+item.points[0].weight.toString()}`)}
        renderItem={({item})=>
        <View style={styles.ExerciseContainer}>
-         <Text style={styles.ExerciseText}>{item.name}</Text>
-         <Text style={styles.ExerciseText}>{item.points[0].sets} x {item.points[0].reps}</Text>
-         <Text style={styles.ExerciseText}>{item.points[0].weight}kg</Text>
-         <Text style={styles.ExerciseText}>{item.points[0].status}</Text>
-         <TouchableOpacity onPress={()=>exerciseToEditHandler(item)}>
-          <Image style={styles.Icon} source={EditIcon} />
-         </TouchableOpacity>
-         <TouchableOpacity onPress={()=>deleteExercise(item)}>
-          <Image style={styles.Icon} source={DeleteIcon} />
-         </TouchableOpacity>
+         <View style={styles.ExerciseNameContainer}>
+            <Text style={styles.ExerciseTextName}>{item.name}</Text>
+         </View>
+         <View style={styles.ExerciseStatsContainer}>
+          <Text style={styles.ExerciseText}>{item.points[0].sets} x {item.points[0].reps}</Text>
+          <Text style={styles.ExerciseText}>{item.points[0].weight}kg</Text>
+          <Text style={styles.ExerciseText}>{item.points[0].status}</Text>
+          <TouchableOpacity onPress={()=>exerciseToEditHandler(item)}>
+            <Image style={styles.Icon} source={EditIcon} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={()=>deleteExercise(item)}>
+            <Image style={styles.Icon} source={DeleteIcon} />
+          </TouchableOpacity>
+         </View>
         </View>} 
        />
        <TouchableOpacity
@@ -341,15 +344,26 @@ const styles = StyleSheet.create({
     alignItems:"center",
   },
   ExerciseContainer:{
-    marginTop:15,
+    width:"95%",
     flexDirection:"row",
-    backgroundColor : "#3b3b3b",
-    alignSelf: 'flex-start',
+    paddingLeft:10,
+    flexWrap:"wrap",
     alignItems:"center",
-    justifyContent:"space-evenly",
-    paddingLeft:2,
-    paddingRight:15,
-    padding:8,
+    backgroundColor: '#3b3b3b',
+    marginTop:16,
+  },
+  ExerciseNameContainer:{
+    marginBottom:5,
+  },
+  ExerciseTextName:{
+    fontSize:16,
+    color:"#fff",
+    fontWeight:"700"
+  },
+  ExerciseStatsContainer:{
+    flexDirection:"row",
+    paddingLeft:10,
+    alignItems:"center"
   },
   ExerciseText:{
     fontSize:16,
