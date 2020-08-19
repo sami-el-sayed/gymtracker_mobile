@@ -6,7 +6,6 @@ import DeleteIcon from "./icons/delete_icon.png";
 
 import Workout from './models/Workout';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import convertKgToLbs from './helpers/convertKgToLbs';
 
 
 interface Props{
@@ -68,6 +67,7 @@ const WorkoutView:React.FC<Props> = ({workout,goToEditWorkout,deleteWorkout,show
         +exercise.points[0].reps.toString()
         +exercise.points[0].weight.toString()}
         `} style={styles.Exercise}>
+            
             <Text style={styles.ExerciseName}>{exercise.name}</Text>
             <View style={styles.ExerciseInfo}>
               <Text style={styles.SetsReps}>{exercise.points[0].sets} x {exercise.points[0].reps} </Text>

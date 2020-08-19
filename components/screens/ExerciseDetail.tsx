@@ -69,7 +69,7 @@ const ExerciseDetail:React.FC<Props> = ({route}) => {
             +exercise.points[0].weight.toString()}
            `} 
            >
-           <Text style={styles.SetsReps}>{exercise.points[0].sets} x {exercise.points[0].sets}</Text>
+           <Text style={styles.SetsReps}>{exercise.points[0].sets} x {exercise.points[0].reps}</Text>
            <Text style={styles.Weight}>{exercise.points[0].weight}kg</Text>
            <Text style={styles.Status}>{exercise.points[0].status}</Text>
          </View>

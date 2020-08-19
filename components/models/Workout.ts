@@ -6,14 +6,17 @@ export default class Workout {
     id?:number;
     workoutDate: string;
     exercises: Exercise[];
+    notes?:string;
 
-    constructor(_date: Date | string,_exercises:Exercise[],_id?:number) {
+    constructor(_date: Date | string,_exercises:Exercise[],_id?:number,_notes?:string) {
         if (_id) this.id = _id;
 
         if(typeof _date === "string" ) this.workoutDate = _date;
         else this.workoutDate = parseDate(_date);
 
         this.exercises = _exercises;
+
+        if(_notes) this.notes = _notes;
 
       }
      

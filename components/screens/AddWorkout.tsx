@@ -1,4 +1,4 @@
-import React, { useState, useContext,useEffect,useRef, useCallback } from 'react';
+import React, { useState, useContext,useEffect,useRef, useCallback, useLayoutEffect } from 'react';
 import { Text, StyleSheet,FlatList, View, TouchableOpacity, KeyboardAvoidingView, Image } from 'react-native';
 import DropdownAlert from 'react-native-dropdownalert';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -8,6 +8,8 @@ import {WorkoutContext} from "../context/WorkoutContext"
 
 import EditIcon from "../icons/edit_icon.png"
 import DeleteIcon from "../icons/delete_icon.png"
+import NoteIcon from "../icons/note_icon.png"
+
 
 import Exercise from '../models/Exercise';
 import ExerciseFormView from '../ExerciseFormView';
@@ -16,6 +18,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import addWorkoutValidation from '../helpers/form_validation/addWorkoutValidation';
 import checkForDuplicateExercise from '../helpers/exercises/checkforDuplicateExercise';
 import createIds from '../helpers/exercises/createIds';
+import { HeaderBackButton } from '@react-navigation/stack';
 
 interface Props 
 {
@@ -30,6 +33,8 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
   const {editedWorkout} = route.params;
   const {copiedWorkout} = route.params;
   let originalWorkoutDate:Date;
+
+
 
 
   if(editedWorkout !==undefined) originalWorkoutDate = editedWorkout.workoutDate;
@@ -55,6 +60,16 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
   //For KeyboardAvoidingView
   const [keyboardEnabled,setKeyboardEnabled] = useState<boolean>(false)
 
+  //Changes what the back Arrow does depending on where we are on Add Workout
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: ()=> (<HeaderBackButton tintColor="#fff" onPress={() => {
+        if (showExerciseForm) setShowExerciseForm(false)
+        else navigation.navigate("Workouts")
+      }}/>)
+    })
+  }, [navigation,showExerciseForm]);
+
 
   //Sets Ids for exercises on render if editWorkout passed
   //Thanks to this exercises can be edited 
@@ -73,16 +88,19 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
       }
   
     },[copiedWorkout])
+
   
 
+    
   useFocusEffect(
     useCallback(() => {
 
       return () => {
-        resetState();
+        //Dont call saving workout for later edit when already editing a workout
       };
     }, [])
   );
+  
   
   //Resets State when screen is left
   const resetState = () => {
@@ -115,7 +133,8 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
       return
     }
 
-    const newWorkout:Workout = new Workout(workoutDate,localExercises);
+    //Creates new Workout to Add/Edit
+    const newWorkout:Workout = new Workout(workoutDate, localExercises);
 
     //If Edited workout means we editing so we save the edit
     if(editedWorkout && saveEditedWorkout && originalWorkoutDate ) {
@@ -244,6 +263,7 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
         </TouchableOpacity>
        </View>
        <FlatList data={localExercises} 
+       style={styles.ExercisesList}
        keyExtractor={(item)=>(`${item.name+item.points[0].sets.toString()+item.points[0].reps.toString()+item.points[0].weight.toString()}`)}
        renderItem={({item})=>
        <View style={styles.ExerciseContainer}>
@@ -254,12 +274,14 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
           <Text style={styles.ExerciseText}>{item.points[0].sets} x {item.points[0].reps}</Text>
           <Text style={styles.ExerciseText}>{item.points[0].weight}kg</Text>
           <Text style={styles.ExerciseText}>{item.points[0].status}</Text>
+          <View style={styles.IconContainer}>
           <TouchableOpacity onPress={()=>exerciseToEditHandler(item)}>
             <Image style={styles.Icon} source={EditIcon} />
           </TouchableOpacity>
           <TouchableOpacity onPress={()=>deleteExercise(item)}>
             <Image style={styles.Icon} source={DeleteIcon} />
           </TouchableOpacity>
+          </View>
          </View>
         </View>} 
        />
@@ -303,6 +325,7 @@ const styles = StyleSheet.create({
   Container:{
     backgroundColor: "#1f1f1f",
     flex:1,
+    overflow:"scroll"
   },
   Title:{
     backgroundColor : "#3b3b3b",
@@ -330,24 +353,37 @@ const styles = StyleSheet.create({
     color:"#fff",
     fontSize:32,
   },
+  IconContainer:{
+    width:"30%",
+    flexDirection:"row",
+    alignItems:"center",
+    paddingLeft:8,
+    justifyContent:"space-between"
+  },
   Icon:{
     width:15,
     height:15,
-    marginLeft:20,
   },
   DateContainer:{
     backgroundColor : "#3b3b3b",
     paddingLeft:5,
     marginTop:15,
-    width:"80%",
+    width:"90%",
     flexDirection:"row",
     alignItems:"center",
+    justifyContent:"space-between",
+    paddingRight:40
+  },
+  ExercisesList:{
+    maxHeight:"65%",
+    overflow:"scroll",
   },
   ExerciseContainer:{
     width:"95%",
     flexDirection:"row",
     paddingLeft:10,
     flexWrap:"wrap",
+    overflow:"scroll",
     alignItems:"center",
     backgroundColor: '#3b3b3b',
     marginTop:16,

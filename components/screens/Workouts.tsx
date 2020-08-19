@@ -21,6 +21,7 @@ const Workouts:React.FC<Props> = ({navigation}) => {
   const {workouts,deleteWorkout,loadWorkouts} = useContext(WorkoutContext)
   const {showCollapsedWorkouts} = useContext(SettingsContext)
 
+  //Saved Workout from add Workout created when leaving component without adding workout
 
   const [filteredWorkouts,setFilteredWorkouts] = useState<Workout[]>([])
 
