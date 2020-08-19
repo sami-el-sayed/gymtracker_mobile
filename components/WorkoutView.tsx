@@ -6,6 +6,7 @@ import DeleteIcon from "./icons/delete_icon.png";
 
 import Workout from './models/Workout';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import NoteView from './NoteView';
 
 
 interface Props{
@@ -23,6 +24,7 @@ const WorkoutView:React.FC<Props> = ({workout,goToEditWorkout,deleteWorkout,show
 
   //Collapse exercises for Workout
   const [collapsed,setCollapsed] = useState<boolean>(showCollapsedWorkouts ? showCollapsedWorkouts : false)
+  const [showNote,setShowNote] = useState<boolean>(false)
 
 
   //Sets workout to be edited as the workout in this component
@@ -32,6 +34,8 @@ const WorkoutView:React.FC<Props> = ({workout,goToEditWorkout,deleteWorkout,show
   const deleteWorkoutHandler = () =>  deleteWorkout && deleteWorkout(workout);
 
   const switchCollapsed = () => setCollapsed(!collapsed)
+  const switchCollapsedNote = () => setShowNote(!showNote)
+
   
   return (
     <View style={styles.Container}>
@@ -46,7 +50,7 @@ const WorkoutView:React.FC<Props> = ({workout,goToEditWorkout,deleteWorkout,show
          <TouchableOpacity onPress={switchCollapsed}>
             <Text style={styles.ExpandIcon}>V</Text>
          </TouchableOpacity>
-         </View>
+        </View>
          :
          <View/>
         }
@@ -79,6 +83,23 @@ const WorkoutView:React.FC<Props> = ({workout,goToEditWorkout,deleteWorkout,show
       :
       <View/>
       }
+      { workout.notes &&
+      (<View>
+      <View style={styles.NoteContainer}>
+        <Text style={styles.NoteTitle}>Notes</Text>
+        <View style={showNote === true ? styles.ExpandIconContainerRotated : styles.ExpandIconContainer}>
+         <TouchableOpacity onPress={switchCollapsedNote}>
+            <Text style={styles.ExpandIconSmaller}>V</Text>
+         </TouchableOpacity>
+        </View>
+      </View>
+        {showNote=== true &&
+          (<View style={styles.Note}>
+            <Text style={styles.NoteText}>{workout.notes}</Text>
+          </View>)
+        }
+      </View>)
+      }
     </View>
   );
 };
@@ -99,6 +120,30 @@ const styles = StyleSheet.create({
     alignItems:"center",
     justifyContent:"space-between"
   },
+  NoteContainer:{
+    flexDirection:"row",
+    alignItems:"center",
+    width:"25%",
+    backgroundColor : "#3b3b3b",
+    justifyContent:"space-between",
+    paddingLeft:10,
+    paddingRight:10,
+    marginTop:5,
+
+  },
+  Note:{
+    backgroundColor : "#3b3b3b",
+    paddingLeft:10,
+    marginTop:5,
+    width:"60%",
+  },
+  NoteTitle:{
+    color:"#fff",
+    fontSize:16,
+  },
+  NoteText:{
+    color:"#fff",
+  },
   IconContainer:{
     width:"40%",
     flexDirection:"row",
@@ -114,6 +159,11 @@ const styles = StyleSheet.create({
     color:"#fff",
     fontWeight:"700",
     fontSize:26,
+  },
+  ExpandIconSmaller:{
+    color:"#fff",
+    fontWeight:"700",
+    fontSize:18,
   },
   ExpandIconContainer:{
 

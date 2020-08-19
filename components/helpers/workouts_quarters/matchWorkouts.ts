@@ -1,8 +1,16 @@
 import Workout from "../../models/Workout";
 
+//Checks if both workouts are the same
+//Returns false if not same workouts
 const matchWorkouts = (workoutA:Workout,workoutB:Workout) => {
     
+    if(workoutA.workoutDate !== workoutB.workoutDate) return false;
     if(workoutA.exercises.length !== workoutB.exercises.length) return false;
+    if(workoutA.notes && !workoutB.notes) return false;
+    if(workoutB.notes && !workoutA.notes) return false;
+    if(workoutA.notes && workoutB.notes){
+      if(workoutA.notes.localeCompare(workoutB.notes) !== 0) return false;
+    }
 
     for (let i = 0; i < workoutA.exercises.length; i++) {
       if(workoutA.exercises[i].name !== workoutB.exercises[i].name) return false;

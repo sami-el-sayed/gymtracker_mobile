@@ -1,5 +1,8 @@
-import React, { useState, useContext,useEffect,useRef, useCallback, useLayoutEffect } from 'react';
+import React, { useState, useContext,useEffect,useRef, useLayoutEffect } from 'react';
 import { Text, StyleSheet,FlatList, View, TouchableOpacity, KeyboardAvoidingView, Image } from 'react-native';
+import { HeaderBackButton } from '@react-navigation/stack';
+import ExerciseFormView from '../ExerciseFormView';
+import NoteView from '../NoteView';
 import DropdownAlert from 'react-native-dropdownalert';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
@@ -10,15 +13,13 @@ import EditIcon from "../icons/edit_icon.png"
 import DeleteIcon from "../icons/delete_icon.png"
 import NoteIcon from "../icons/note_icon.png"
 
-
 import Exercise from '../models/Exercise';
-import ExerciseFormView from '../ExerciseFormView';
 import Workout from '../models/Workout';
-import { useFocusEffect } from '@react-navigation/native';
+
 import addWorkoutValidation from '../helpers/form_validation/addWorkoutValidation';
 import checkForDuplicateExercise from '../helpers/exercises/checkforDuplicateExercise';
 import createIds from '../helpers/exercises/createIds';
-import { HeaderBackButton } from '@react-navigation/stack';
+import validateNote from '../helpers/form_validation/noteValidation';
 
 interface Props 
 {
@@ -54,21 +55,27 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
 
   //state for exercises that we want to add to new workout
   const [localExercises,setLocalExercises] = useState<Exercise[]>( copiedWorkout ? copiedWorkout.exercises :  editedWorkout ? editedWorkout.exercises : [])
-  const [showExerciseForm,setShowExerciseForm] = useState<boolean>(false)
   const [exerciseToEdit,setExerciseToEdit] = useState<Exercise | undefined>(undefined)
+
+  //State for note
+  const [note,setNote] = useState<string>( editedWorkout?.notes !== undefined ? editedWorkout.notes : "");
 
   //For KeyboardAvoidingView
   const [keyboardEnabled,setKeyboardEnabled] = useState<boolean>(false)
+  const [showExerciseForm,setShowExerciseForm] = useState<boolean>(false)
+  const [showNoteForm,setShowNoteForm] = useState<boolean>(false)
+
 
   //Changes what the back Arrow does depending on where we are on Add Workout
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: ()=> (<HeaderBackButton tintColor="#fff" onPress={() => {
         if (showExerciseForm) setShowExerciseForm(false)
+        else if (showNoteForm) setShowNoteForm(false)
         else navigation.navigate("Workouts")
       }}/>)
     })
-  }, [navigation,showExerciseForm]);
+  }, [navigation,showExerciseForm,showNoteForm]);
 
 
   //Sets Ids for exercises on render if editWorkout passed
@@ -80,27 +87,21 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
     }
   },[editedWorkout])
 
-    //If Copie Workout is passed it sets its exercises to the one being copied
-    useEffect(()=>{
-      if(copiedWorkout) {
-        setLocalExercises(createIds(copiedWorkout.exercises));
-        DropdownAlertRef.current?.alertWithType("success","Workout Copied!","Now Pick a Date!");
-      }
+  //If Copie Workout is passed it sets its exercises to the one being copied
+  useEffect(()=>{
+    if(copiedWorkout) {
+      setLocalExercises(createIds(copiedWorkout.exercises));
+      DropdownAlertRef.current?.alertWithType("success","Workout Copied!","Now Pick a Date!");
+    }
   
-    },[copiedWorkout])
+  },[copiedWorkout])
 
+  //Goes to the page that lets copying workouts
+  const copyWorkoutHandler=() => {
+    navigation.push("Copy Workout");
+  }
   
 
-    
-  useFocusEffect(
-    useCallback(() => {
-
-      return () => {
-        //Dont call saving workout for later edit when already editing a workout
-      };
-    }, [])
-  );
-  
   
   //Resets State when screen is left
   const resetState = () => {
@@ -134,7 +135,7 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
     }
 
     //Creates new Workout to Add/Edit
-    const newWorkout:Workout = new Workout(workoutDate, localExercises);
+    const newWorkout:Workout = new Workout(workoutDate, localExercises,undefined,note.trim().length > 0 ? note : undefined);
 
     //If Edited workout means we editing so we save the edit
     if(editedWorkout && saveEditedWorkout && originalWorkoutDate ) {
@@ -166,10 +167,12 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
     setShowExerciseForm(true)
   }
 
+  const editNote = () => {
+    setShowNoteForm(true)
+  }
+
   //Adds Exercise to Workout Exercises Array
   //Adds ID for easier editing
-
-
   const addExerciseToWorkout = (exerciseToAdd:Exercise) => {
     //Checks for duplicat exercises with every local exercise in the array
     //If it finds one it returns 
@@ -184,6 +187,7 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
     exerciseToAdd.id = localExercises.length;
     setLocalExercises([...localExercises,exerciseToAdd]);
   }
+  
 
 
   //Edits exercise based on ID
@@ -214,6 +218,7 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
     setShowExerciseForm(true)
   }
 
+
   //Deletes local exercise from added/edited workout
   const deleteExercise = (exerciseToDelete:Exercise) => {
     let exercisesCopy:Exercise[] = localExercises.slice();
@@ -221,10 +226,15 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
     setLocalExercises(createIds(exercisesCopy));
   }
 
-  //Goes to the page that lets copying workouts
-  const copyWorkoutHandler=() => {
-    navigation.push("Copy Workout");
+  const saveNote = (noteToSave:string) => {
+    const noteValidated:[boolean,string?] = validateNote(noteToSave);
+    if(noteValidated[0] === true){
+      setNote(noteToSave)
+      setShowNoteForm(false)
+    }
+    else DropdownAlertRef.current?.alertWithType("error","Error!", `${noteValidated[1]}`);
   }
+
 
 
   //Todo Reformat this piece of trash
@@ -254,13 +264,18 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
     </View>
     :
     <View>
-    {showExerciseForm === false ?
+    {showExerciseForm === false  && showNoteForm === false?
      <View>
        <View style={styles.DateContainer}>
         <Text style={styles.Date}>{workoutDate.toDateString()}</Text>
+
         <TouchableOpacity onPress={()=>setShowDatePicker(true)}>
           <Image style={styles.Icon} source={EditIcon} />
         </TouchableOpacity>
+        <TouchableOpacity onPress={editNote}>
+          <Image style={styles.Icon} source={NoteIcon} />
+        </TouchableOpacity>
+
        </View>
        <FlatList data={localExercises} 
        style={styles.ExercisesList}
@@ -302,6 +317,13 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
         <View/>
        }
      </View>
+     :
+     showExerciseForm === false && showNoteForm === true ?
+     <NoteView
+     noteProps={note}
+     saveNote={saveNote}
+     setKeyboardEnabled={setKeyboardEnabled}
+     /> 
      :
      <ExerciseFormView
      exerciseNames={exercises}
