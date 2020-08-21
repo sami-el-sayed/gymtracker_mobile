@@ -105,7 +105,7 @@ const ExerciseFormView:React.FC<Props> = ({exerciseNames, exercise,setShowExerci
 
 
   return (
-    <>
+    <View style={styles.Container}>
       <Text style={styles.Title}>Exercise Name</Text>
       <View style={styles.PickerView}>
         <Picker
@@ -120,22 +120,24 @@ const ExerciseFormView:React.FC<Props> = ({exerciseNames, exercise,setShowExerci
            }))}          
         </Picker>
       </View>
-      <Text style={styles.Title}>Sets</Text>
-      <TextInput
+      <View style={styles.SetsReps}>
+        <Text style={styles.SmallTitle}>Sets</Text>
+        <TextInput
           keyboardType="numeric"
           onFocus={()=>setKeyboardEnabled(false)}
           style={styles.TextInputNumber}
           onChangeText={text => onChangeHandler("sets",text)}
           value={exerciseForm.sets}
-      />
-      <Text style={styles.Title}>Reps</Text>
-      <TextInput
+        />
+        <Text style={styles.SmallTitle}>Reps</Text>
+        <TextInput
           keyboardType="numeric"
           onFocus={()=>setKeyboardEnabled(false)}
           style={styles.TextInputNumber}
           onChangeText={text => onChangeHandler("reps",text)}
           value={exerciseForm.reps}
-      />
+        />
+      </View>
       <Text style={styles.Title}>Weight (kg)</Text>
       <TextInput
           keyboardType="numeric"
@@ -161,18 +163,35 @@ const ExerciseFormView:React.FC<Props> = ({exerciseNames, exercise,setShowExerci
          >
           <Text style={styles.ButtonText}>Save</Text>
       </TouchableOpacity>
-    </>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+    Container:{
+        flexDirection:"column",
+        justifyContent:"space-around",
+    },
     Title:{
         backgroundColor:"#3b3b3b",
         width:"30%",
-        marginBottom:10,
+        marginBottom:5,
         marginTop:10,
         fontSize:16,
         color:"#fff"
+    },
+    SmallTitle:{
+        backgroundColor:"#3b3b3b",
+        padding:10,
+        color:"#fff"
+    },
+    SetsReps:{
+        width:"95%",
+        flexDirection:"row",
+        alignItems:"center",
+        justifyContent:"space-evenly",
+        marginTop:20,
+        marginBottom:20
     },
     TextInput:{
         height:40,
@@ -188,11 +207,10 @@ const styles = StyleSheet.create({
         fontSize:16,
     },
     Button:{
+        marginTop:15,
         alignItems: 'center',
         backgroundColor: '#3b3b3b',
-        padding: 10,
-        marginTop:40
-    
+        padding: 5,
       },
     ButtonText:{
         fontSize:16,

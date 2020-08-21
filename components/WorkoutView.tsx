@@ -129,7 +129,6 @@ const styles = StyleSheet.create({
     paddingLeft:10,
     paddingRight:10,
     marginTop:5,
-
   },
   Note:{
     backgroundColor : "#3b3b3b",
