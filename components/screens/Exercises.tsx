@@ -34,7 +34,7 @@ const Exercises:React.FC<Props> = ({navigation}) => {
 
  
  const goToExerciseDetailsHandler = (exercise:string) => {
-  navigation.navigate("ExerciseDetail",{exercise:exercise});
+  navigation.navigate("Exercise Detail",{exercise:exercise});
  }
 
 

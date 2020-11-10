@@ -23,9 +23,9 @@ const ExercisesStackScreen = () => {
             },
           }}
         />
-        <ExercisesStack.Screen name="ExerciseDetail" component = {ExerciseDetail} 
+        <ExercisesStack.Screen name="Exercise Detail" component = {ExerciseDetail} 
          options={{
-            title: 'Details',
+            title: ' Details',
             headerStyle: {
               backgroundColor: '#292929',
             },

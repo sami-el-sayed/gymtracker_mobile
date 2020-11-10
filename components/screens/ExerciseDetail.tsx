@@ -10,9 +10,10 @@ import sortWorkouts from '../helpers/workouts_quarters/sortWorkouts';
 interface Props 
 {
   route:any;
+  navigation:any;
 }
 
-const ExerciseDetail:React.FC<Props> = ({route}) => {
+const ExerciseDetail:React.FC<Props> = ({route,navigation}) => {
 
   const {exercise} = route.params
 
@@ -22,12 +23,12 @@ const ExerciseDetail:React.FC<Props> = ({route}) => {
   const [ExerciseProgress,setExerciseProgress] = useState<Workout[]>([])
 
 
+  //Loads Points from context and changes screen title to name of exercise
   useEffect(()=>{
+    navigation.setOptions({title: `${exercise} Details`});
     if(workouts) loadPoints();
   },[workouts])
 
-  //Sort points by Date
-  const sortPoints = (pointsArr:Point[]):Point[] => pointsArr.sort((a,b)=>b.date.getTime()-a.date.getTime())
 
   //Loads All the Points found in the Workouts Storage
   const loadPoints = async () => {
@@ -45,8 +46,6 @@ const ExerciseDetail:React.FC<Props> = ({route}) => {
       setExerciseProgress(sortWorkouts(loadProgress(filteredWorkouts,exercise)))
     }
     else setExerciseProgress(filteredWorkouts);
-    
-
   }
 
   return (
