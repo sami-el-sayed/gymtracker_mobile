@@ -1,5 +1,5 @@
 import React, { useState, useContext,useEffect,useRef, useLayoutEffect } from 'react';
-import { Text, StyleSheet,FlatList, View, TouchableOpacity, KeyboardAvoidingView, Image } from 'react-native';
+import { Text, StyleSheet,FlatList, View, TouchableOpacity, KeyboardAvoidingView, Image, Platform } from 'react-native';
 import { HeaderBackButton } from '@react-navigation/stack';
 import ExerciseFormView from '../ExerciseFormView';
 import NoteView from '../NoteView';
@@ -20,6 +20,8 @@ import addWorkoutValidation from '../helpers/form_validation/addWorkoutValidatio
 import checkForDuplicateExercise from '../helpers/exercises/checkforDuplicateExercise';
 import createIds from '../helpers/exercises/createIds';
 import validateNote from '../helpers/form_validation/noteValidation';
+import { ScrollView } from 'react-native-gesture-handler';
+import getDatePlusMonth from '../helpers/date/getDatePlusMonth';
 
 interface Props 
 {
@@ -239,9 +241,13 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
 
   //Todo Reformat this piece of trash
   return (
-    <KeyboardAvoidingView behavior="position" enabled={keyboardEnabled} style={styles.Container}>
+    <KeyboardAvoidingView 
+    behavior={Platform.OS == "ios" ? "padding" : "height"}
+    keyboardVerticalOffset={10} 
+    enabled={keyboardEnabled} 
+    style={styles.Container}>
       {showDatePicker && (
-        <DateTimePicker maximumDate={new Date()}  mode="date" value={workoutDate ? workoutDate : new Date()} onChange={(event,date)=>onDateChange(event,date)} />
+        <DateTimePicker maximumDate={getDatePlusMonth()}  mode="date" value={workoutDate ? workoutDate : new Date()} onChange={(event,date)=>onDateChange(event,date)} />
       )}
      {dateSet === false ?
      <View>
@@ -325,15 +331,17 @@ const AddWorkout:React.FC<Props> = ({navigation,route}) => {
      setKeyboardEnabled={setKeyboardEnabled}
      /> 
      :
-     <ExerciseFormView
-     exerciseNames={exercises}
-     exercise={exerciseToEdit}
-     editExercise={editExercise}
-     addExerciseToWorkout={addExerciseToWorkout} 
-     setKeyboardEnabled={setKeyboardEnabled} 
-     setShowExerciseForm={setShowExerciseForm}
-     dropDownAlert={DropdownAlertRef.current}
-     />
+     <ScrollView>
+      <ExerciseFormView
+      exerciseNames={exercises}
+      exercise={exerciseToEdit}
+      editExercise={editExercise}
+      addExerciseToWorkout={addExerciseToWorkout} 
+      setKeyboardEnabled={setKeyboardEnabled} 
+      setShowExerciseForm={setShowExerciseForm}
+      dropDownAlert={DropdownAlertRef.current}
+      />
+     </ScrollView>
     }
     </View>
     }

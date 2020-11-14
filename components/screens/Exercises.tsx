@@ -6,6 +6,7 @@ import {StyleSheet,Text, FlatList, TextInput, View, TouchableOpacity, Image, Ale
 
 import DeleteIcon from "../icons/delete_icon.png"
 import addExerciseValidation from '../helpers/form_validation/addExerciseValidation';
+import NoDataView from '../NoDataView';
 
 interface Props{
   navigation:any
@@ -81,15 +82,21 @@ const Exercises:React.FC<Props> = ({navigation}) => {
 
   return (
     <View style={styles.Container}>
-      <View style={styles.Search}>
-        <Text style={styles.SearchText}> Search: </Text>
-      <TextInput
-        style={styles.SearchInput}
-        onChangeText={text => setSearchedExercise(text)}
-        value={searchedExercise}
-        /> 
-      </View>
-      <FlatList
+      {!exercises || exercises.length === 0 ? 
+      <NoDataView
+      option={"exercises"}
+      />
+      :
+      <View>
+        <View style={styles.Search}>
+          <Text style={styles.SearchText}> Search: </Text>
+          <TextInput
+          style={styles.SearchInput}
+          onChangeText={text => setSearchedExercise(text)}
+          value={searchedExercise}
+          /> 
+        </View>
+        <FlatList
         keyExtractor={(item)=>item.toString()}
         style={styles.List}
         data={filteredExercises} 
@@ -99,7 +106,9 @@ const Exercises:React.FC<Props> = ({navigation}) => {
           <TouchableOpacity onPress={()=>deleteExerciseHandler(item)}><Image style={styles.Icon} source={DeleteIcon}/></TouchableOpacity>
         </View>
         }
-      />
+        />
+      </View>
+      }
       {showAddExercise === false ? 
       <TouchableOpacity
       style={styles.Button}
@@ -132,6 +141,9 @@ const styles = StyleSheet.create({
   Container:{
     backgroundColor: "#1f1f1f",
     height: "100%",
+    flex: 1,
+    justifyContent: 'flex-end',  
+
   },
   Search:{
     paddingLeft:10,

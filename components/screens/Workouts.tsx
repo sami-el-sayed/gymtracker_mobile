@@ -9,6 +9,9 @@ import {SettingsContext} from "../context/SettingsContext"
 import WorkoutView from "../WorkoutView";
 import Workout from '../models/Workout';
 import parseDate from '../helpers/date/parseDate';
+import SearchWorkoutBar from '../SearchWorkoutBar';
+import getDatePlusMonth from '../helpers/date/getDatePlusMonth';
+import NoDataView from '../NoDataView';
 
 
 interface Props 
@@ -40,6 +43,7 @@ const Workouts:React.FC<Props> = ({navigation}) => {
     setShowSearch(false)
   },[workouts])
 
+  //Filters workouts based on date and optin from search bar
   const filterWorkouts = (option:string) => {
     if(workouts === undefined) return
     if(searchDate === undefined) return
@@ -48,26 +52,20 @@ const Workouts:React.FC<Props> = ({navigation}) => {
 
     switch (option) {
       case "before":
-
         setFilteredWorkouts(workouts.filter((workout)=>{
           return new Date(workout.workoutDate).getTime() < parsedDateElapsedTime;
         }));
-
         break;
       case "equals":
-
         setFilteredWorkouts(workouts.filter((workout)=>{
           return new Date(workout.workoutDate).getTime() === parsedDateElapsedTime;
         }));
-
         break;
       case "after":
-        
         setFilteredWorkouts(workouts.filter((workout)=>{
           return new Date(workout.workoutDate).getTime() > parsedDateElapsedTime;
         }));
         break;
-        
       default:
         setFilteredWorkouts(workouts)
         setSearchDate(undefined)
@@ -81,6 +79,7 @@ const Workouts:React.FC<Props> = ({navigation}) => {
   //When top of the list is reached tries to download more Workouts
   const loadWorkoutsHandler = () => loadWorkouts && loadWorkouts();
 
+  //Call to deleting workout from button
   const deleteWorkoutHandler = (workout:Workout) => {
 
     if(deleteWorkout === undefined) return;
@@ -111,82 +110,44 @@ const Workouts:React.FC<Props> = ({navigation}) => {
     setShowDatePicker(false);
   };
 
-
-
   return (
     <View style={styles.Container}>
       {showDatePicker && (
-        <DateTimePicker maximumDate={new Date()}  mode="date" value={new Date()} onChange={(event,date)=>onDateChange(event,date)} />
+        <DateTimePicker maximumDate={getDatePlusMonth()}  mode="date" value={new Date()} onChange={(event,date)=>onDateChange(event,date)} />
       )}
-      <View style={styles.SearchContainer}>
-        {showSearch ? 
-        <View style={styles.Search}>
-          <TouchableOpacity
-          style={styles.Button}
-          onPress={()=>setShowDatePicker(true)}
-          >
-            <Text style={styles.ButtonTextDate}>
-              {searchDate ? `${(searchDate.getMonth()+1)+'-'+searchDate.getDate()+'-'+searchDate.getFullYear()}` : "Pick Date"}</Text>
-              </TouchableOpacity>
-              {searchDate ?
-              <View style={styles.searchButtons}>
-                <TouchableOpacity
-                style={styles.SearchButton}
-                onPress={()=>filterWorkouts("before")}
-                >
-                 <Text style={styles.SearchButtonText}>{"<"}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                style={styles.SearchButton}
-                onPress={()=>filterWorkouts("after")}
-                >
-                  <Text style={styles.SearchButtonText}>{">"}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                style={styles.SearchButton}
-                onPress={()=>filterWorkouts("equals")}
-                >
-                  <Text style={styles.SearchButtonText}>{"="}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                style={styles.SearchButton}
-                onPress={()=>filterWorkouts("none")}
-                >
-                  <Text style={styles.SearchButtonText}>{"X"}</Text>
-                </TouchableOpacity>
-              </View>
-              :
-              <View/>
-              }
-
-        </View>
-        :
-        <TouchableOpacity
-         style={styles.Button}
-         onPress={()=>setShowSearch(true)}
-        >
-          <Text style={styles.ButtonText}>Search Workouts</Text>
-        </TouchableOpacity>
-        }
-      </View>
-      <FlatList 
-      style={styles.List}
-      inverted data={filteredWorkouts} 
-      keyExtractor={(item)=> item.workoutDate}
-      onEndReached={(loadWorkoutsHandler)}
-      renderItem={({item}) =>
-      <WorkoutView 
-      deleteWorkout={deleteWorkoutHandler}
-      goToEditWorkout={goToAddWorkoutHandler}
-      showCollapsedWorkouts={showCollapsedWorkouts} 
-      workout={item}/>}
+      {!workouts || workouts.length === 0  ?
+      <NoDataView
+      option={"workouts"}
       />
+      :
+      <View>
+        <SearchWorkoutBar
+        filterWorkouts={filterWorkouts}
+        showSearch={showSearch}
+        searchDate={searchDate}
+        setShowDatePicker={setShowDatePicker}
+        setShowSearch={setShowSearch}
+        />
+        <FlatList 
+        style={styles.List}
+        inverted data={filteredWorkouts} 
+        keyExtractor={(item)=> item.workoutDate}
+        onEndReached={(loadWorkoutsHandler)}
+        renderItem={({item}) =>
+        <WorkoutView 
+        deleteWorkout={deleteWorkoutHandler}
+        goToEditWorkout={goToAddWorkoutHandler}
+        showCollapsedWorkouts={showCollapsedWorkouts} 
+        workout={item}/>}
+        />
+      </View>
+      }
       <TouchableOpacity
-         style={styles.Button}
-         onPress={()=>goToAddWorkoutHandler()}
-      >
-          <Text style={styles.ButtonText}>Add Workout</Text>
-      </TouchableOpacity>
+           style={styles.Button}
+           onPress={()=>goToAddWorkoutHandler()}
+        >
+            <Text style={styles.ButtonText}>Add Workout</Text>
+        </TouchableOpacity>
     </View>
   );
 };
@@ -195,34 +156,8 @@ const styles = StyleSheet.create({
   Container:{
     height:"100%",
     backgroundColor: "#1f1f1f",
-  },
-
-  SearchContainer:{
-    backgroundColor : "#3b3b3b",
-    color:"#fff",
-    fontSize:16,
-    marginBottom:15
-  },
-  Search:{
-    flexDirection:"row",
-    justifyContent:"space-between",
-    paddingLeft:10,
-    paddingRight:10
-  },
-  searchButtons:{
-    flexDirection:"row",
-    alignItems: 'center',
-
-  },
-  SearchButton:{
-    backgroundColor: '#3b3b3b',
-    paddingLeft: 20,
-    paddingRight: 20,
-  },
-  SearchButtonText:{
-    fontSize:20,
-    color:"#d4d4d4",
-    textTransform:"uppercase"
+    flex: 1,
+    justifyContent: 'flex-end',  
   },
   List:{
     height:"90%"
@@ -237,13 +172,6 @@ const styles = StyleSheet.create({
     fontSize:16,
     color:"#d4d4d4",
     textTransform:"uppercase"
-  },
-  ButtonTextDate:{
-    fontSize:18,
-    fontWeight:"700",
-    color:"#d4d4d4",
-    textTransform:"uppercase"
-
   }
 });
 
